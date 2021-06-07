@@ -1,0 +1,314 @@
+%\RCS $Id: manual.tex,v 1.3 2000/02/07 15:08:00 sufrin Exp sufrin $
+%
+%
+%
+\def\rmbox#1{\mbox{{\rm #1}}}
+%
+%
+%
+\sect{Running \LOGPRO}
+The \LOGPRO interpreters are available in the Laboratory filestore as
+\begin{smalltt}
+        /ecslab/sufrin/logpro/bin/logpro
+        /ecslab/sufrin/logpro/bin/x86-solaris/logpro
+        /ecslab/sufrin/logpro/bin/sparc-solaris/logpro
+        /ecslab/sufrin/logpro/bin/x86-linux/logpro
+\end{smalltt}
+
+The first of these is a bytecode interpreter, and can be used anywhere there is an
+installation of ocaml 2.02. The others are binary executables which can
+be used on a machine with the appropriate architecture and operating system.\footnote{The Linux 
+version was compiled and runs under a completely standard RedHat 6.1 distribution. I don't
+know of any reason why it might not run under other Linux distributions.}
+
+
+Once the appropriate path is added to your PATH variable, the \LOGPRO interpreter is invoked with the command
+\begin{smalltt}
+        logpro [path path ... path]
+\end{smalltt}
+
+After the  commands in the specified files have been read,\footnote{For each
+$path$, \LOGPRO reads the file $path\mathtt{.lp}$ if it exists, and otherwise
+reads the file $path$.}
+the  intepreter enters interactive mode, initially prompting for
+each command with \verb|--|,\footnote{If 
+the interpreter requires more input in response to 
+its prompt -- perhaps because a query or directive has not yet been terminated properly, then
+it will prompt again with its secondary prompt: {\tt >>}} and responding to queries by
+displaying the substitutions which satisfy them\footnote{Or ``{\tt Yes}'' if there are no
+variables in the query} in sequence. After each substitution is displayed,
+the interpreter prompts with a ``\verb|?|'': responding to
+this with ``\verb|.|'' terminates the search for substitutions;
+responding with a newline causes the search to continue. At any
+stage during the evaluation of a query, it can be interrupted
+by typing the appropriate interrupt character for the operating
+system on which it is being run.
+
+
+
+
+
+\sect{Commands}
+A \LOGPRO command is either a \emph{clause} taking the form
+\begin{smalltt}
+        \(formula\) :- \(formula\), \(formula\), \(\cdots\) \(formula\).
+\end{smalltt}
+or a \emph{query} taking one of the (equivalent) forms
+\begin{smalltt}
+        :- \(formula\), \(formula\), \(\cdots\) \(formula\).
+           \(formula\), \(formula\), \(\cdots\) \(formula\)?
+\end{smalltt}
+or a \emph{directive} taking one of the forms in Table \ref{Directives}.
+
+If there are no formul\ae\xspace to the right of the
+entailment symbol \verb.:-.  in a clause then that symbol
+may be omitted.
+
+
+\begin{center}
+\begin{table}[hpb]
+\def\cmd#1{{\tt \##1}}
+\def\Q{{\tt"}}
+\begin{tabular}{|ll|l|}\hline
+    Command && Effect\\\hline\hline
+    \cmd{use}      &\(path\)          &\rmbox{Read the file specified by the given path (no more than once per session)}
+    \\\cmd{width}  &\(number\)        &\rmbox{Set the output width to $number$ columns}
+    \\\cmd{infix0} &\Q\(symbol\)\Q    &\rmbox{Declare the  symbol to be a right-associative infix operator, priority 0}             
+    \\\cmd{infix1} &\Q\(symbol\)\Q    &\rmbox{Declare the  symbol to be a right-associative infix operator, priority 1}  
+    \\...          &                  &
+    \\\cmd{infix7} &\Q\(symbol\)\Q    &\rmbox{Declare the  symbol to be a right-associative infix operator, priority 7}  
+    \\\cmd{infix8} &\Q\(symbol\)\Q    &\rmbox{Declare the  symbol to be a \emph{left-associative} infix operator, priority 8} 
+    \\\cmd{prefix} &\Q\(symbol\)\Q    &\rmbox{Declare the  symbol to be a prefix operator with maximal priority} 
+    \\\cmd{notfix} &\Q\(symbol\)\Q    &\rmbox{Declare the  symbol to be a prefix operator with minimal priority} 
+    \\\cmd{trace}  &on                &\rmbox{Trace the invocation of each predicate}
+    \\\cmd{trace}  &all               &\rmbox{As above and show the complete current substitution at each invocation}
+    \\\cmd{trace}  &off               &\rmbox{Stop tracing}
+    \\\cmd{check}  &on \(or\) off     &\rmbox{Enable or disable the occurs check in unification}
+    \\\cmd{count}  &on \(or\) off     &\rmbox{Enable or disable the printing of inference count with answers}
+    \\\hline
+\end{tabular}
+\caption{Directives}
+\label{Directives}
+\end{table}
+\end{center}
+
+\sect{Notation}
+Any text appearing between a \verb"/*" and the  subsequent
+\verb"*/" is treated as a comment and ignored, as is any text
+appearing between a \verb"--" and the subsequent newline.
+
+
+A \emph{word} is any consecutive sequence of letters, digits, underscores or primes.
+
+A \emph{symbol} is any consecutive sequence of one or more of the  characters
+``\verb.!^%$@&/\;=><.'',  ``\verb.:+-*/~|.''  
+
+The symbol \verb":-" is the \emph{entailment} symbol. 
+Any other symbol or word may be declared to be an infix, prefix, or notfix operator using
+one of the directives outlined in Table \ref{Directives}. Unless declared otherwise by such a 
+directive, all symbols behave as left associative infix operators of priority 8.
+
+A \emph{term} has one of the forms described below, whilst a {\em formula} has any of these 
+but the first three.
+\begin{enumerate}
+\item  a (possibly negated) \emph{integer}. For example:
+\begin{smalltt}
+        34567
+        -32
+\end{smalltt}
+\item  a \emph{double-quoted string}.
+\item  a \emph{variable} -- which is a word beginning with an uppercase letter. For example:
+\begin{smalltt}
+        X
+        Rumpelstiltskin
+        State_Space
+\end{smalltt}
+ 
+\item  an \emph{atom} --  which is a word beginning with a lowercase letter. For example:
+\begin{smalltt}
+        it_is_raining
+        david
+        pruneSquallor
+\end{smalltt}
+\item  a \emph{prefix composite} -- an atom, followed by a parenthesized, 
+        comma-separated, list of \emph{term}s.  
+For example:
+\begin{smalltt}
+        grandparent(X, Y)
+        connected(From, To, Via)
+        simply(purple)
+        negative(2)
+\end{smalltt}
+\item an \emph{infix composite} -- a pair of terms separated by an infix operator. 
+For example, after the directive {\tt \#infix3 "divides"}
+\begin{smalltt}
+        Var + Const
+        3 divides 62
+\end{smalltt}
+\item a \emph{leftfix composite} -- a term followed by a bracketed term.
+        This is regarded as syntactic sugar 
+        for a prefix composite with functor {\tt{[]}}.
+For example:
+\begin{smalltt}
+        f[Arg] \rmbox{is sugar for} [](f, Arg)
+        g[x][y] \rmbox{is sugar for} []([](g, x), y)
+\end{smalltt}
+\item a \emph{rightfix composite} -- a term bracketed by the ``fat
+brackets'' \tt{[|} and \tt{|]}. This is regarded as syntactic sugar 
+        for a prefix composite with functor {\tt{[||]}}.
+For example:
+\begin{smalltt}
+        [|I|] S \rmbox{is sugar for} [||](I, S)
+        [|I|][|J|]S \rmbox{is sugar for} [||](I, [||](J, S))
+\end{smalltt}
+
+Leftfix composites have higher priority than rightfix composites. For example:
+\begin{smalltt}
+        [|I|]J[S] \rmbox{is sugar for} [||](I, [](J, S))
+\end{smalltt}
+\item an \emph{outfix composite} -- a curly-bracketed, 
+        comma-separated, possibly-empty, list of \emph{term}s. 
+        This is regarded as syntactic sugar 
+        for a prefix composite with functor {\tt{\{\}}}.
+For example:
+\begin{smalltt}
+        \{\} \rmbox{is sugar for} \{\}()
+        \{foo, bar\} \rmbox{is sugar for} \{\}(foo, bar)
+\end{smalltt}
+
+\item  a 
+\emph{notfix operator} followed by a \emph{term}. The only built-in 
+notfix operator is {\tt not}, but others may be declared using the {\tt{\#notfix}}
+directive (Table \ref{Directives}). \emph{Notfix operator}s have less priority than 
+any other forms of operator. 
+For example
+\begin{smalltt}
+        not male(X)
+        not append(X, Y, Z)
+        not not contradiction(X)
+\end{smalltt}
+With directives {\tt \#notfix "let"}, and {\tt \#infix3 "in"}
+\begin{smalltt}
+        let x=3 in x+2 
+\end{smalltt}
+yields the formula whose structure is
+\begin{smalltt}
+        let(in((=)(x, 3), (+)(x, 2)))
+\end{smalltt}
+
+
+\item a 
+\emph{prefix operator} followed by a \emph{term}. There are no
+built-in prefix operators, but they may be declared using the {\tt{\#prefix}}
+directive (Table \ref{Directives}). \emph{Prefix operator}s have higher priority than 
+infix operators. 
+For example, after the directives {\tt \#prefix "factor"} and
+{\tt \#infix3 "or"}
+\begin{smalltt}
+        factor Y or magic(Y, Z)
+\end{smalltt}
+\end{enumerate}
+
+\sect{Built-In Relations}
+The relations and symbols built-in to \LOGPRO are described in Table \ref{Builtin}.
+\begin{center}
+\begin{table}[hpb]
+\def\|#1|#2|{{\tt #1}&$#2$&}
+\begin{tabular}{|l|l|l|}\hline
+Relation        &Arguments  &Effect (Restriction)\\\hline\hline
+\|!             |           |the cut symbol 
+\\
+\|fail          |           |always fails 
+\\
+\|sum           |(A,B,C)    |$C$ is the sum of $A$ and $B$. (No more than one variable) 
+\\
+\|prod          |(A,B,C)    |$C$ is the product of $A$ and $B$. (No more than one variable) 
+\\
+\|succ          |(A, B)     |$B$ is the natural number successor to $A$. (No more than one variable)
+\\
+\|>=            |(A, B)     |$A \geq B$. (No variables).
+\\
+\|>             |(A, B)     |$A > B$. (No variables).
+\\
+\|<=            |(A, B)     |$A \leq B$. (No variables).
+\\
+\|<             |(A, B)     |$A < B$. (No variables).
+\\
+\|num           |(A)        |$A$ is an integer.
+\\
+\|str           |(A)        |$A$ is a string.
+\\
+\|atom          |(A)        |$A$ is an atom.
+\\
+\|var           |(A)        |$A$ is an uninstantiated variable.
+\\
+\|nonvar        |(A)        |$A$ is not an uninstantiated variable.
+\\
+\|toString      |(A,B)      |$B$ is the string representing the term $A$.
+\\
+\|toFormula     |(A,B)      |$B$ is the formula represented by the string $A$.
+\\
+\|functor       |(A,OP,B)   |$A$ is the formula with principal connective $OP$ and list of arguments $B$.
+\\
+\|call          |(A, B, ...)|The formulae $A, B, ...$ are evaluated in sequence.
+\\
+\|len           |(A,B)      |$B$ is the length of the string $A$.
+\\
+\|cat           |(A,B,C)    |$C$ is the catenation of the strings $A$ and $B$ (No more than one variable).
+\\
+\|hd            |(A,B)      |$B$ is a string consisting of the first character of the string $A$ (ditto).
+\\
+\|tl            |(A,B)      |$B$ consists of all but the first character of the string $A$ (ditto).
+\\
+\|ascii         |(A,B)      |$B$ is the ascii code of the first character of the string $A$ (ditto).
+\\
+\|read          |(A)        |The string $A$ is the next line read from the terminal.
+\\
+\|show          |(A, B, ...)|The terms $A, B, ...$ are printed on the terminal followed by a newline.
+\\
+\|write         |(A, B, ...)|The terms $A, B, ...$ are printed on the terminal.
+\\
+\hline
+\multicolumn{3}{|c|}{The following relations manipulate the built-in updateable mapping from terms to terms}
+\\
+\hline
+\|map\_Lookup|(A, B)|$B$ is the current value of the mapping at key $A$. 
+\\
+\|map\_Add|(A, B)|The value of the mapping at key $A$ is overlaid by $B$. 
+\\
+\|map\_Enter|(A, B)|The value of the mapping at key $A$ becomes $B$; previous values removed. 
+\\
+\|map\_Remove|(A)|Remove the topmost value of the mapping at key $A$. 
+\\
+\|map\_All|(A, B)|$B$ is the list of values of the mapping at key $A$. 
+\\
+\hline
+\end{tabular}
+\caption{Built-in Relations}
+\label{Builtin}
+\end{table}
+\end{center}
+
+\sect{Changes}
+
+\begin{enumerate}
+\item[V1.44]  
+\begin{enumerate}
+\item The syntax of terms has been extended to accomodate ``fat brackets''. 
+\item Different primary and secondary prompts ({\tt --} and {\tt >>} respectively)
+\end{enumerate}\end{enumerate}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

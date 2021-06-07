@@ -1,0 +1,451 @@
+\documentclass{article}
+\input{logproversion}
+\usepackage[a4paper]{papersize}
+\usepackage{verbatim}
+%\usepackage{RCS}
+\usepackage{alltt}
+\usepackage{xspace}
+%\RCS $Id: practicals.tex,v 2.0 2000/02/07 16:46:23 sufrin Exp sufrin $
+\title{I(2) Programming Languages\\Logic Programming Laboratories}
+\author{Bernard Sufrin}
+\date{Version of February 7, 2002}
+%
+%
+\parindent=0pt
+\parskip=\medskipamount
+\flushbottom
+%
+%
+\def\LOGPRO{{\ttfamily\slshape LogPro}\xspace}
+\newenvironment{smalltt}{\begin{small}\begin{alltt}}{\end{alltt}\end{small}}
+\def\rmbox#1{\mbox{{\rm #1}}}
+%
+%
+\begin{document}
+\maketitle
+\begin{abstract}
+\noindent This document describes the {\it complete} set of three Labs for the
+Programming Languages course. The first two labs are identical to those
+in the earlier revision of this document. 
+
+\noindent Changes:
+\begin{enumerate}
+\item  The syntax of \LOGPRO version 1.44 has been extended to accomodate ``fat brackets''. 
+\item  \LOGPRO  1.44 has different primary and secondary prompts ({\tt --} and {\tt >>} respectively)
+\end{enumerate}
+\end{abstract}
+
+\section{First Lab}
+This Lab is designed to get you acquainted with the \LOGPRO system and 
+with Prolog.
+
+\begin{enumerate}
+\item Read Appendix \ref{Manual} to find out how to run the \LOGPRO system.
+
+\item Define {\tt append} in the usual way, and 
+\begin{smalltt}
+        isrot(XS, YS) :- append(LS, RS, XS), append(RS, LS, YS).
+\end{smalltt}
+
+Now find the answers to the query {\tt isrot(1:2:3:nil, YS)}?
+
+What happens if you make the query  {\tt isrot(XS, 1:2:3:nil)}?
+Can you explain why?\footnote{You may not be able to answer this
+part of the question fully until we have explained the Prolog
+execution model more fully in lectures, but if you turn on
+tracing in the \LOGPRO interpreter you may be able to describe what is
+happening in a little more detail, and that will be
+enough for the moment.}
+
+
+\item In the lectures we partly defined the relation $is$ to implement
+basic arithmetic notation.
+\begin{smalltt}
+        #infix1 is
+        #infix4 +
+        #infix5 *
+        V is V   :- num(V).
+        V is E+F :- Ev is E, Fv is F, sum(Ev, Fv, V). 
+        V is E*F :- Ev is E, Fv is F, prod(Ev, Fv, V). 
+\end{smalltt}
+complete the definition of this relation so that it includes division, subtraction, and 
+remainder. 
+
+\item Investigate, and explain,\footnote{See the previous footnote.} what happens when you try to use {\tt is}
+``backwards'', to solve a query such as
+\begin{smalltt}
+        3 is V+1?
+\end{smalltt}
+
+
+\item Change the definition of {\tt is} so that it works for strings
+as well as numbers. Overload (+) to signify catenation as well as addition, 
+and use \verb.-. and \verb./. for suffix and prefix removal.  
+\begin{verbatim}
+        "foobar" is "foo" + "bar"
+        "foo"    is "foobar" - "bar"
+        "bar"    is "foobar" / "foo"
+\end{verbatim}
+Avoid repeated evaluation of the subexpressions of composite
+expressions if you can. 
+        
+\begin{comment}
+        #infix1 is
+        #infix4 +
+        #infix5 *
+        V is V   :- num(V).
+        V is V   :- str(V).
+        V is E+F :- Ev is E, Fv is F, evplus(Ev, Fv, V). 
+        V is E*F :- Ev is E, Fv is F, prod(Ev, Fv, V). 
+        
+        evplus(V1, V2, V) :- num(V1), num(V2), sum(V1, V2, V).
+        evplus(V1, V2, V) :- str(V1), str(V2), cat(V1, V2, V).
+\end{comment}
+
+
+\end{enumerate}
+
+\section{Second Lab}
+A binary tree takes one of the forms
+
+\begin{center}\begin{tabular}{ll}\tt
+        leaf(\(E\))             &\rmbox{where \(E\) is a term}
+        \\
+        \(T\sb1\) ** \(T\sb2\)   &\rmbox{where \(T\sb1\), \(T\sb2\) are binary trees}
+\end{tabular}
+\end{center}
+\begin{enumerate}
+\item (``Cat-elimination'')
+\begin{enumerate}
+\item Define a predicate {\tt flatten/2} such that $flatten(T, L)$ holds 
+if $L$ is the list formed by the elements at the leaves of the tree $Y$.
+For example
+\begin{smalltt}
+        flatten((leaf(1)**leaf(2))**(leaf(3)**leaf(4)), 1:2:3:4:nil)?
+\end{smalltt}
+Use the predicate {\tt append/3} to form the list, and investigate 
+(using the directive {\tt \#count on}) how
+many inferences are needed in the best and worst cases when the result list 
+is of length 4, 8, 12, 16, and 20. 
+
+\item Define a predicate {\tt flat/2} with the same specification
+as {\tt flatten}, but use open-lists and open-list-append to 
+form the answer list. Investigate the number of inferences needed in the
+best and worst cases as in the previous exercise.
+
+\end{enumerate}
+What do you conclude from parts (a) and (b) above?
+
+\item Can either {\tt flatten} or {\tt flat} be used ``backwards'' -- 
+in other words to form a tree from a list? 
+
+\item Define a predicate {\tt formtree/2} such that $formtree(L, T)$ holds
+if $T$ is a balanced binary tree formed from the elements of the list $L$, 
+and such that $formtree(L, T)$ holds whenever $flat(T, L)$ holds.
+
+\item Can {\tt formtree/2} be used backwards -- in other words to form a list from a tree?
+
+\end{enumerate}
+
+\section{Third Lab} 
+
+In this Lab  we investigate the use of Prolog to prototype the
+operational semantics of the Plain language developed in the lectures. With a
+modicum of advance preparation the two parts can be taken at one sitting.
+
+We take for granted the following \LOGPRO definitions of
+the equality and inequality relations
+\begin{smalltt}
+        #infix3 "=" 
+        #infix3 "/=" 
+        X=X         :- .
+        X/=Y        :- not X=Y.   
+\end{smalltt}
+\def\dom{\mathop{\mathbf{dom}}}
+
+We will represent finite mappings by terms of the form $\{\}$ 
+(for the empty mapping), and $U\mapsto V ~~\&~~ M$ for the mapping 
+written $M\oplus\{U\mapsto V\}$ in the lecture notes.
+
+\subsection*{Part 1} 
+The following clauses define the relation $lookup(X, MAP, R)$
+which holds between a term $MAP$ (representing a finite mapping $map$), 
+and terms $X$ and $R$  when $X\in \dom map \land R=map(X)$.\footnote{We have deliberately
+left out the clause defining $lookup$ in an empty mapping so that we
+can explore the possibility of having ``stuck'' configurations.}
+\begin{smalltt}
+        #infix6 "|->"
+        #infix5 "&"
+        lookup(X, U|->V & MAP, V)      :- X=U.
+        lookup(X, U|->V & MAP, R)      :- X/=U, lookup(X, MAP, R).
+\end{smalltt}
+
+
+
+\subsubsection*{Task} Define a relation $update(MAP, X\mapsto Y, MAP')$ which holds 
+between terms ($MAP, MAP'$) representing mappings ($map, map'$) when
+$map'=map\oplus\{X\mapsto Y\}$. In addition: if $X$ is already in the domain of
+$map$ then {\em the representation of $map'$ should be no larger 
+than that of $map$} (in other words should contain no more terms). For example
+\begin{smalltt}
+        update(                  \{\}, a|->2, a|->2 & \{\})
+        update(          a|->1 & \{\}, a|->2, a|->2 & \{\})
+        update(b |-> 4 & a|->1 & \{\}, a|->2, b |-> 4 & a|->2 & \{\})
+\end{smalltt}
+
+
+The additional requirement is present to ensure that while
+the operational semantics of a program are simulated, the term
+representing a store contains no more than a single value for
+each variable in the store.\footnote{This is essential if humans
+are to be able to make sense of the output of a simulation.}
+
+
+
+\subsection*{Part 2} 
+
+The inference rules of an operational semantics can often
+be modelled by Prolog clauses in which the consequent of the
+rule appears as the head of the clause, and the antecedents
+as the right hand side. This works satisfactorily only if
+the side conditions of the rules are encoded as predicates
+and are used as guards ({\it i.e.\/} early) on the right hand
+side.\footnote{The notational conventions we use to present
+the rules in the lecture notes must also be respected by the
+Prolog program, and the best way of doing so is to treat them
+as additional side-conditions.}
+
+
+Here, for example, is an encoding of a few of the Plain rules
+as a \LOGPRO program. 
+
+\newpage
+We start with syntactic declarations
+\begin{smalltt}
+        #infix0 "-|>"
+        #infix3 ";"
+        #infix4 ":="
+        #infix7 "+"
+        #infix7 "-"
+\end{smalltt}
+
+
+Next we define predicates which capture some of the side conditions.
+\begin{smalltt}
+        id(I)                :- atom(I), I/=skip.
+        con(E)               :- num(E).
+\end{smalltt}
+
+Our configurations are encoded as \LOGPRO terms in one of the forms\footnote{{\bf NB: the ``fat bracket'' notation is only available in
+\LOGPRO versions 1.44 and later. If you don't presently have access to this,
+you may encode configurations as {\tt Program | Store} after declaring 
+{\tt \#infix0 |}}}
+\begin{smalltt}
+        [| Program    |] Store  
+        [| Expression |] Store  
+\end{smalltt}
+
+and our judgements as relations of the form
+\begin{smalltt}
+        CONFIGURATION -|> CONFIGURATION'  
+\end{smalltt}
+
+A configuration is in normal form if its program component is {\tt skip}. 
+\begin{smalltt}
+        normalForm([| skip |] S) :- .
+\end{smalltt}
+
+We want to show the names of the rules which are used during the execution of
+a program, so we define the predicate {\tt rule} and 
+end each rule by calling it.
+\begin{smalltt}
+        #notfix rule
+        rule S :- show(" (by", S, ")").
+\end{smalltt}
+
+The first few rules are encoded as follows\footnote{The rule for identifiers is
+not quite the same as that given in the levcture notes, because $lookup$
+fails when presented with variables which not already in the store. This is deliberate -- we want to
+be able to produce a ``stuck'' configuration easily.}
+\begin{smalltt}
+    [|  I       |] S        -|>    [|  V     |] S   :- id(I),  
+                                                       lookup(I, S, V),
+                                                       rule "var".
+                                                      
+    [|  I:=E    |] S        -|>    [|  skip  |] S'  :- id(I), 
+                                                       con(E), 
+                                                       update(S, I|->E, S'),
+                                                       rule "assign.2".
+
+    [|  I:=E    |] S        -|>    [|  I:=E' |] S   :- id(I), not con(E), 
+                                                       [| E |] S -|> [| E' |] S,
+                                                       rule "assign.1".
+                                                       
+    [|  P; Q    |] S        -|>    [|  P'; Q |] S'  :- P/=skip,
+                                                       [| P |] S -|> [| P' |] S',
+                                                       rule "seq.1".
+
+    [|  skip; Q |] S        -|>    [|  Q     |] S   :- rule "seq.2".
+\end{smalltt}
+
+The {\tt -|>} relation describes only a single step in the (top-level)
+execution of a program, although this step may involve the use of
+several structural inference rules in addition to any computation rule
+it uses. 
+
+For example:
+\begin{smalltt}
+        [| x := 3 ; y := 4 |] \{\}   -|>  CONFIG' ?
+         (by assign.2 )
+         (by seq.1 )
+        CONFIG' = [| skip ; y := 4 |] x |-> 3 & \{\}  
+\end{smalltt}
+
+The complete program execution relation {\tt -|>* } is encoded as 
+follows:\footnote{({\it For the theoretically inclined:\/}) Notice that {\tt -|>*} computes a subrelation of
+the transitive closure of {\tt -|>}.
+In fact it is only the ``stuck'' configurations that are not actually
+reached by execution of {\tt -|>*}, even though 
+the last {\tt show} it executes shows a configuration which is not 
+in the domain of {\tt -|>}.}
+\begin{smalltt}
+    #infix0 "-|>*"
+    CONFIG  -|>* CONFIG    :- normalForm(CONFIG),
+                              show(CONFIG, "  finished.").           
+
+    CONFIG  -|>* CONFIG''  :- not(normalForm(CONFIG)),
+                              show(CONFIG, "  -|>"),
+                              CONFIG  -|> CONFIG',
+                              CONFIG' -|>* CONFIG''.
+\end{smalltt}
+
+Notice that we take pains to show the configuration at each stage, and to inform the
+user when a program has finished. 
+For example
+\begin{alltt}
+    ...
+    [| x := 3 ; y := x |] \{\}   -|>
+     (by assign.2 )
+     (by seq.1 )
+    [| skip ; y := x |] x |-> 3 & \{\}   -|>
+     (by seq.2 )
+    [| y := x |] x |-> 3 & \{\}   -|>
+     (by var )
+     (by assign.1 )
+    [| y := 3 |] x |-> 3 & \{\}   -|>
+     (by assign.2 )
+    [| skip |] x |-> 3 & y |-> 3 & \{\}   finished.
+\end{alltt}
+
+If the program is just stuck,\footnote{For the moment the only way this is
+possible is if a variable is referenced for which there is not yet a value in the
+store.} the ``finished'' epithet is never applied. For example:
+\begin{smalltt}    
+    ...
+    [| x := 3 ; y := z |] \{\}   -|>
+     (by assign.2 )
+     (by seq.1 )
+    [| skip ; y := z |] x |-> 3 & \{\}   -|>
+     (by seq.2 )
+    [| y := z |] x |-> 3 & \{\}   -|>
+\end{smalltt}
+\subsubsection*{Tasks} 
+
+\begin{enumerate}
+\item 
+Encode the rules for addition so that they prescribe a left-to-right
+order of evaluation.
+\item 
+Define the following ``driver'' relation
+\begin{smalltt}
+    #notfix run
+    run Program :- [| Program |] \{\} -|>* Config'
+\end{smalltt}
+and give evidence that the encoding of the rules you gave in part 1 
+is appropriate  by
+running the following predicates.
+\begin{smalltt}
+        prob1  :- run x:=3 .
+        prob2  :- run x:=3; y:=x .
+        prob2a :- run x:=3; y:=z .
+        prob3  :- run x:=3; y:=4; z:=x .
+        prob4  :- run x:=3; y:=4; z:=x+y .
+\end{smalltt}
+\item 
+Change the rules for addition so that they no longer prescribe left-to-right
+evaluation, and try running {\tt prob4} again. What do you notice?
+
+
+\item 
+Encode the rules for {\tt after} and gather evidence of their
+appropriateness by running (with the order-prescriptive rules for
+addition back in place)
+\begin{smalltt}
+        prob5 :- run x:=3; y:=4; z:=(x after x:=x+1) .
+\end{smalltt}
+{\bf Hint:} You will  need to change a few of the rules so that they permit
+the evaluation of expressions with side-effects. Make a
+note of what happens before you change them.
+
+\item Optional tasks (independent of each other)
+\begin{enumerate}
+\item ({\it for the moderately ambitious\/})
+Encode the rules for conditionals, and gather evidence of
+their appropriateness. You will need to add relational operators
+to the language. If you are successful in this then encode the iteration rules.
+
+{\bf Hint:}  It is wisest to represent these constructs directly ({\it i.e.} in their
+abstract syntax forms, as exemplified below), rather than trying to 
+find  syntactic declarations for \LOGPRO which make it possible to write them in
+the (admittedly more readable) concrete forms given in the notes.
+\begin{smalltt}
+        if(\(condition\), \(TrueProgram\), \(FalseProgram\))
+        while(\(condition\), \(LoopBody\))
+\end{smalltt}
+
+\item ({\it for the somewhat persistent\/})
+Try running the following predicate
+with non-order-prescriptive rules for addition in place
+\begin{smalltt}
+        prob6 :- run x:=3; y:=4; z:=(x after x:=x+1)+x.
+\end{smalltt}
+Can you explain what is happening?
+
+Now, if you have time, {\it and you are more than just somewhat persistent\/} try 
+the following with the same rules in place
+\begin{smalltt}
+        prob7 :- run x:=3; y:=4; z:=(x after x:=y)+(y after y:=x).
+\end{smalltt}
+Can you explain what is happening?
+
+\end{enumerate}
+\end{enumerate}
+%---------------------------------------------------------------------------
+\newpage
+\appendix
+\section{The \LOGPRO Manual (for version \LOGPROVERSION)}\label{Manual}
+\newcommand{\sect}[1]{\subsection{#1}}
+\newcommand{\subsect}[1]{\subsubsection{#1}}
+\input{manual}
+%---------------------------------------------------------------------------
+\clearpage
+\pagenumbering{roman}
+\newpage
+\tableofcontents
+%\RCSSignature
+
+Typeset on \today
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+

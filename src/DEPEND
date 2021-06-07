@@ -1,0 +1,104 @@
+builtin.cmo : \
+    util.cmo \
+    unify.cmo \
+    syntax.cmo \
+    subst.cmo \
+    scanner.cmo \
+    printer.cmo \
+    parser.cmi \
+    db.cmo
+builtin.cmx : \
+    util.cmx \
+    unify.cmx \
+    syntax.cmx \
+    subst.cmx \
+    scanner.cmx \
+    printer.cmx \
+    parser.cmx \
+    db.cmx
+db.cmo : \
+    util.cmo \
+    syntax.cmo
+db.cmx : \
+    util.cmx \
+    syntax.cmx
+logpro.cmo : \
+    version.cmo \
+    util.cmo \
+    unify.cmo \
+    trace.cmo \
+    syntax.cmo \
+    subst.cmo \
+    scanner.cmo \
+    printer.cmo \
+    parser.cmi \
+    db.cmo \
+    builtin.cmo
+logpro.cmx : \
+    version.cmx \
+    util.cmx \
+    unify.cmx \
+    trace.cmx \
+    syntax.cmx \
+    subst.cmx \
+    scanner.cmx \
+    printer.cmx \
+    parser.cmx \
+    db.cmx \
+    builtin.cmx
+parser.cmo : \
+    syntax.cmo \
+    parser.cmi
+parser.cmx : \
+    syntax.cmx \
+    parser.cmi
+parser.cmi : \
+    syntax.cmo
+printer.cmo : \
+    syntax.cmo \
+    scanner.cmo
+printer.cmx : \
+    syntax.cmx \
+    scanner.cmx
+scanner.cmo : \
+    syntax.cmo \
+    parser.cmi
+scanner.cmx : \
+    syntax.cmx \
+    parser.cmx
+subst.cmo : \
+    util.cmo \
+    syntax.cmo \
+    printer.cmo
+subst.cmx : \
+    util.cmx \
+    syntax.cmx \
+    printer.cmx
+syntax.cmo :
+syntax.cmx :
+trace.cmo : \
+    util.cmo \
+    syntax.cmo \
+    subst.cmo \
+    printer.cmo
+trace.cmx : \
+    util.cmx \
+    syntax.cmx \
+    subst.cmx \
+    printer.cmx
+unify.cmo : \
+    util.cmo \
+    syntax.cmo \
+    subst.cmo \
+    printer.cmo
+unify.cmx : \
+    util.cmx \
+    syntax.cmx \
+    subst.cmx \
+    printer.cmx
+util.cmo : \
+    syntax.cmo \
+    printer.cmo
+util.cmx : \
+    syntax.cmx \
+    printer.cmx

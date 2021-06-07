@@ -1,0 +1,2430 @@
+   0  $accept : %entry% $end
+
+   1  cmd : Form DOT
+   2      | Form IF DOT
+   3      | Form IF Forms DOT
+   4      | IF Forms DOT
+   5      | Forms QUERY
+   6      | EOF
+
+   7  Forms : Form
+   8        | Form COMMA Forms
+
+   9  Form : Part
+  10       | Form INFIX0 Form
+  11       | Form INFIX1 Form
+  12       | Form INFIX2 Form
+  13       | Form INFIX3 Form
+  14       | Form INFIX4 Form
+  15       | Form INFIX5 Form
+  16       | Form INFIX6 Form
+  17       | Form INFIX7 Form
+  18       | Form INFIX8 Form
+  19       | Form SBRA Form SKET
+  20       | WBRA Form WKET Form
+  21       | NOTFIX Form
+  22       | PREFIX Form
+  23       | error
+
+  24  Part : NUM
+  25       | STRING
+  26       | NAME
+  27       | BRA Form KET
+  28       | Struct
+
+  29  Struct : ATOM
+  30         | ATOM BRA Forms KET
+  31         | ATOM BRA KET
+  32         | CBRA Forms CKET
+  33         | CBRA CKET
+  34         | BRA INFIX0 KET
+  35         | BRA INFIX1 KET
+  36         | BRA INFIX2 KET
+  37         | BRA INFIX3 KET
+  38         | BRA INFIX4 KET
+  39         | BRA INFIX5 KET
+  40         | BRA INFIX6 KET
+  41         | BRA INFIX7 KET
+  42         | BRA INFIX8 KET
+  43         | BRA NOTFIX KET
+  44         | BRA PREFIX KET
+  45         | BRA SBRA SKET KET
+  46         | BRA WBRA WKET KET
+  47         | BRA INFIX0 KET BRA Forms KET
+  48         | BRA INFIX1 KET BRA Forms KET
+  49         | BRA INFIX2 KET BRA Forms KET
+  50         | BRA INFIX3 KET BRA Forms KET
+  51         | BRA INFIX4 KET BRA Forms KET
+  52         | BRA INFIX5 KET BRA Forms KET
+  53         | BRA INFIX6 KET BRA Forms KET
+  54         | BRA INFIX7 KET BRA Forms KET
+  55         | BRA INFIX8 KET BRA Forms KET
+  56         | BRA NOTFIX KET BRA Forms KET
+  57         | BRA PREFIX KET BRA Forms KET
+  58         | BRA SBRA SKET KET BRA Forms KET
+  59         | BRA WBRA WKET KET BRA Forms KET
+
+  60  cmd : DIRECTIVE Thing
+  61      | DIRECTIVE DOT
+  62      | DOT
+
+  63  Thing : NAME
+  64        | ATOM
+  65        | NUM
+  66        | STRING
+  67        | INFIX0
+  68        | INFIX1
+  69        | INFIX2
+  70        | INFIX3
+  71        | INFIX4
+  72        | INFIX5
+  73        | INFIX6
+  74        | INFIX7
+  75        | INFIX8
+  76        | NOTFIX
+  77        | PREFIX
+
+  78  formula : Form
+
+  79  %entry% : '\001' cmd
+  80          | '\002' formula
+
+state 0
+	$accept : . %entry% $end  (0)
+
+	'\001'  shift 1
+	'\002'  shift 2
+	.  error
+
+	%entry%  goto 3
+
+
+state 1
+	%entry% : '\001' . cmd  (79)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	DIRECTIVE  shift 12
+	BRA  shift 13
+	CBRA  shift 14
+	IF  shift 15
+	DOT  shift 16
+	EOF  shift 17
+	.  error
+
+	cmd  goto 18
+	Form  goto 19
+	Forms  goto 20
+	Part  goto 21
+	Struct  goto 22
+
+
+state 2
+	%entry% : '\002' . formula  (80)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	formula  goto 23
+	Form  goto 24
+	Part  goto 21
+	Struct  goto 22
+
+
+state 3
+	$accept : %entry% . $end  (0)
+
+	$end  accept
+
+
+state 4
+	Form : error .  (23)
+
+	.  reduce 23
+
+
+state 5
+	Part : NAME .  (26)
+
+	.  reduce 26
+
+
+state 6
+	Struct : ATOM .  (29)
+	Struct : ATOM . BRA Forms KET  (30)
+	Struct : ATOM . BRA KET  (31)
+
+	BRA  shift 25
+	$end  reduce 29
+	INFIX0  reduce 29
+	INFIX1  reduce 29
+	INFIX2  reduce 29
+	INFIX3  reduce 29
+	INFIX4  reduce 29
+	INFIX5  reduce 29
+	INFIX6  reduce 29
+	INFIX7  reduce 29
+	INFIX8  reduce 29
+	WKET  reduce 29
+	SBRA  reduce 29
+	KET  reduce 29
+	CKET  reduce 29
+	SKET  reduce 29
+	COMMA  reduce 29
+	IF  reduce 29
+	DOT  reduce 29
+	QUERY  reduce 29
+
+
+state 7
+	Form : PREFIX . Form  (22)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 26
+	Part  goto 21
+	Struct  goto 22
+
+
+state 8
+	Form : NOTFIX . Form  (21)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 27
+	Part  goto 21
+	Struct  goto 22
+
+
+state 9
+	Form : WBRA . Form WKET Form  (20)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 28
+	Part  goto 21
+	Struct  goto 22
+
+
+state 10
+	Part : NUM .  (24)
+
+	.  reduce 24
+
+
+state 11
+	Part : STRING .  (25)
+
+	.  reduce 25
+
+
+state 12
+	cmd : DIRECTIVE . Thing  (60)
+	cmd : DIRECTIVE . DOT  (61)
+
+	NAME  shift 29
+	ATOM  shift 30
+	PREFIX  shift 31
+	NOTFIX  shift 32
+	INFIX0  shift 33
+	INFIX1  shift 34
+	INFIX2  shift 35
+	INFIX3  shift 36
+	INFIX4  shift 37
+	INFIX5  shift 38
+	INFIX6  shift 39
+	INFIX7  shift 40
+	INFIX8  shift 41
+	NUM  shift 42
+	STRING  shift 43
+	DOT  shift 44
+	.  error
+
+	Thing  goto 45
+
+
+state 13
+	Part : BRA . Form KET  (27)
+	Struct : BRA . INFIX0 KET  (34)
+	Struct : BRA . INFIX1 KET  (35)
+	Struct : BRA . INFIX2 KET  (36)
+	Struct : BRA . INFIX3 KET  (37)
+	Struct : BRA . INFIX4 KET  (38)
+	Struct : BRA . INFIX5 KET  (39)
+	Struct : BRA . INFIX6 KET  (40)
+	Struct : BRA . INFIX7 KET  (41)
+	Struct : BRA . INFIX8 KET  (42)
+	Struct : BRA . NOTFIX KET  (43)
+	Struct : BRA . PREFIX KET  (44)
+	Struct : BRA . SBRA SKET KET  (45)
+	Struct : BRA . WBRA WKET KET  (46)
+	Struct : BRA . INFIX0 KET BRA Forms KET  (47)
+	Struct : BRA . INFIX1 KET BRA Forms KET  (48)
+	Struct : BRA . INFIX2 KET BRA Forms KET  (49)
+	Struct : BRA . INFIX3 KET BRA Forms KET  (50)
+	Struct : BRA . INFIX4 KET BRA Forms KET  (51)
+	Struct : BRA . INFIX5 KET BRA Forms KET  (52)
+	Struct : BRA . INFIX6 KET BRA Forms KET  (53)
+	Struct : BRA . INFIX7 KET BRA Forms KET  (54)
+	Struct : BRA . INFIX8 KET BRA Forms KET  (55)
+	Struct : BRA . NOTFIX KET BRA Forms KET  (56)
+	Struct : BRA . PREFIX KET BRA Forms KET  (57)
+	Struct : BRA . SBRA SKET KET BRA Forms KET  (58)
+	Struct : BRA . WBRA WKET KET BRA Forms KET  (59)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 46
+	NOTFIX  shift 47
+	INFIX0  shift 48
+	INFIX1  shift 49
+	INFIX2  shift 50
+	INFIX3  shift 51
+	INFIX4  shift 52
+	INFIX5  shift 53
+	INFIX6  shift 54
+	INFIX7  shift 55
+	INFIX8  shift 56
+	WBRA  shift 57
+	SBRA  shift 58
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 59
+	Part  goto 21
+	Struct  goto 22
+
+
+state 14
+	Struct : CBRA . Forms CKET  (32)
+	Struct : CBRA . CKET  (33)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	CKET  shift 60
+	.  error
+
+	Form  goto 61
+	Forms  goto 62
+	Part  goto 21
+	Struct  goto 22
+
+
+state 15
+	cmd : IF . Forms DOT  (4)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 61
+	Forms  goto 63
+	Part  goto 21
+	Struct  goto 22
+
+
+state 16
+	cmd : DOT .  (62)
+
+	.  reduce 62
+
+
+state 17
+	cmd : EOF .  (6)
+
+	.  reduce 6
+
+
+state 18
+	%entry% : '\001' cmd .  (79)
+
+	.  reduce 79
+
+
+state 19
+	cmd : Form . DOT  (1)
+	cmd : Form . IF DOT  (2)
+	cmd : Form . IF Forms DOT  (3)
+	Forms : Form .  (7)
+	Forms : Form . COMMA Forms  (8)
+	Form : Form . INFIX0 Form  (10)
+	Form : Form . INFIX1 Form  (11)
+	Form : Form . INFIX2 Form  (12)
+	Form : Form . INFIX3 Form  (13)
+	Form : Form . INFIX4 Form  (14)
+	Form : Form . INFIX5 Form  (15)
+	Form : Form . INFIX6 Form  (16)
+	Form : Form . INFIX7 Form  (17)
+	Form : Form . INFIX8 Form  (18)
+	Form : Form . SBRA Form SKET  (19)
+
+	INFIX0  shift 64
+	INFIX1  shift 65
+	INFIX2  shift 66
+	INFIX3  shift 67
+	INFIX4  shift 68
+	INFIX5  shift 69
+	INFIX6  shift 70
+	INFIX7  shift 71
+	INFIX8  shift 72
+	SBRA  shift 73
+	COMMA  shift 74
+	IF  shift 75
+	DOT  shift 76
+	QUERY  reduce 7
+
+
+state 20
+	cmd : Forms . QUERY  (5)
+
+	QUERY  shift 77
+	.  error
+
+
+state 21
+	Form : Part .  (9)
+
+	.  reduce 9
+
+
+state 22
+	Part : Struct .  (28)
+
+	.  reduce 28
+
+
+state 23
+	%entry% : '\002' formula .  (80)
+
+	.  reduce 80
+
+
+state 24
+	Form : Form . INFIX0 Form  (10)
+	Form : Form . INFIX1 Form  (11)
+	Form : Form . INFIX2 Form  (12)
+	Form : Form . INFIX3 Form  (13)
+	Form : Form . INFIX4 Form  (14)
+	Form : Form . INFIX5 Form  (15)
+	Form : Form . INFIX6 Form  (16)
+	Form : Form . INFIX7 Form  (17)
+	Form : Form . INFIX8 Form  (18)
+	Form : Form . SBRA Form SKET  (19)
+	formula : Form .  (78)
+
+	INFIX0  shift 64
+	INFIX1  shift 65
+	INFIX2  shift 66
+	INFIX3  shift 67
+	INFIX4  shift 68
+	INFIX5  shift 69
+	INFIX6  shift 70
+	INFIX7  shift 71
+	INFIX8  shift 72
+	SBRA  shift 73
+	$end  reduce 78
+
+
+state 25
+	Struct : ATOM BRA . Forms KET  (30)
+	Struct : ATOM BRA . KET  (31)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	KET  shift 78
+	CBRA  shift 14
+	.  error
+
+	Form  goto 61
+	Forms  goto 79
+	Part  goto 21
+	Struct  goto 22
+
+
+state 26
+	Form : Form . INFIX0 Form  (10)
+	Form : Form . INFIX1 Form  (11)
+	Form : Form . INFIX2 Form  (12)
+	Form : Form . INFIX3 Form  (13)
+	Form : Form . INFIX4 Form  (14)
+	Form : Form . INFIX5 Form  (15)
+	Form : Form . INFIX6 Form  (16)
+	Form : Form . INFIX7 Form  (17)
+	Form : Form . INFIX8 Form  (18)
+	Form : Form . SBRA Form SKET  (19)
+	Form : PREFIX Form .  (22)
+
+	.  reduce 22
+
+
+state 27
+	Form : Form . INFIX0 Form  (10)
+	Form : Form . INFIX1 Form  (11)
+	Form : Form . INFIX2 Form  (12)
+	Form : Form . INFIX3 Form  (13)
+	Form : Form . INFIX4 Form  (14)
+	Form : Form . INFIX5 Form  (15)
+	Form : Form . INFIX6 Form  (16)
+	Form : Form . INFIX7 Form  (17)
+	Form : Form . INFIX8 Form  (18)
+	Form : Form . SBRA Form SKET  (19)
+	Form : NOTFIX Form .  (21)
+
+	INFIX0  shift 64
+	INFIX1  shift 65
+	INFIX2  shift 66
+	INFIX3  shift 67
+	INFIX4  shift 68
+	INFIX5  shift 69
+	INFIX6  shift 70
+	INFIX7  shift 71
+	INFIX8  shift 72
+	SBRA  shift 73
+	$end  reduce 21
+	WKET  reduce 21
+	KET  reduce 21
+	CKET  reduce 21
+	SKET  reduce 21
+	COMMA  reduce 21
+	IF  reduce 21
+	DOT  reduce 21
+	QUERY  reduce 21
+
+
+state 28
+	Form : Form . INFIX0 Form  (10)
+	Form : Form . INFIX1 Form  (11)
+	Form : Form . INFIX2 Form  (12)
+	Form : Form . INFIX3 Form  (13)
+	Form : Form . INFIX4 Form  (14)
+	Form : Form . INFIX5 Form  (15)
+	Form : Form . INFIX6 Form  (16)
+	Form : Form . INFIX7 Form  (17)
+	Form : Form . INFIX8 Form  (18)
+	Form : Form . SBRA Form SKET  (19)
+	Form : WBRA Form . WKET Form  (20)
+
+	INFIX0  shift 64
+	INFIX1  shift 65
+	INFIX2  shift 66
+	INFIX3  shift 67
+	INFIX4  shift 68
+	INFIX5  shift 69
+	INFIX6  shift 70
+	INFIX7  shift 71
+	INFIX8  shift 72
+	WKET  shift 80
+	SBRA  shift 73
+	.  error
+
+
+state 29
+	Thing : NAME .  (63)
+
+	.  reduce 63
+
+
+state 30
+	Thing : ATOM .  (64)
+
+	.  reduce 64
+
+
+state 31
+	Thing : PREFIX .  (77)
+
+	.  reduce 77
+
+
+state 32
+	Thing : NOTFIX .  (76)
+
+	.  reduce 76
+
+
+state 33
+	Thing : INFIX0 .  (67)
+
+	.  reduce 67
+
+
+state 34
+	Thing : INFIX1 .  (68)
+
+	.  reduce 68
+
+
+state 35
+	Thing : INFIX2 .  (69)
+
+	.  reduce 69
+
+
+state 36
+	Thing : INFIX3 .  (70)
+
+	.  reduce 70
+
+
+state 37
+	Thing : INFIX4 .  (71)
+
+	.  reduce 71
+
+
+state 38
+	Thing : INFIX5 .  (72)
+
+	.  reduce 72
+
+
+state 39
+	Thing : INFIX6 .  (73)
+
+	.  reduce 73
+
+
+state 40
+	Thing : INFIX7 .  (74)
+
+	.  reduce 74
+
+
+state 41
+	Thing : INFIX8 .  (75)
+
+	.  reduce 75
+
+
+state 42
+	Thing : NUM .  (65)
+
+	.  reduce 65
+
+
+state 43
+	Thing : STRING .  (66)
+
+	.  reduce 66
+
+
+state 44
+	cmd : DIRECTIVE DOT .  (61)
+
+	.  reduce 61
+
+
+state 45
+	cmd : DIRECTIVE Thing .  (60)
+
+	.  reduce 60
+
+
+state 46
+	Form : PREFIX . Form  (22)
+	Struct : BRA PREFIX . KET  (44)
+	Struct : BRA PREFIX . KET BRA Forms KET  (57)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	KET  shift 81
+	CBRA  shift 14
+	.  error
+
+	Form  goto 26
+	Part  goto 21
+	Struct  goto 22
+
+
+state 47
+	Form : NOTFIX . Form  (21)
+	Struct : BRA NOTFIX . KET  (43)
+	Struct : BRA NOTFIX . KET BRA Forms KET  (56)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	KET  shift 82
+	CBRA  shift 14
+	.  error
+
+	Form  goto 27
+	Part  goto 21
+	Struct  goto 22
+
+
+state 48
+	Struct : BRA INFIX0 . KET  (34)
+	Struct : BRA INFIX0 . KET BRA Forms KET  (47)
+
+	KET  shift 83
+	.  error
+
+
+state 49
+	Struct : BRA INFIX1 . KET  (35)
+	Struct : BRA INFIX1 . KET BRA Forms KET  (48)
+
+	KET  shift 84
+	.  error
+
+
+state 50
+	Struct : BRA INFIX2 . KET  (36)
+	Struct : BRA INFIX2 . KET BRA Forms KET  (49)
+
+	KET  shift 85
+	.  error
+
+
+state 51
+	Struct : BRA INFIX3 . KET  (37)
+	Struct : BRA INFIX3 . KET BRA Forms KET  (50)
+
+	KET  shift 86
+	.  error
+
+
+state 52
+	Struct : BRA INFIX4 . KET  (38)
+	Struct : BRA INFIX4 . KET BRA Forms KET  (51)
+
+	KET  shift 87
+	.  error
+
+
+state 53
+	Struct : BRA INFIX5 . KET  (39)
+	Struct : BRA INFIX5 . KET BRA Forms KET  (52)
+
+	KET  shift 88
+	.  error
+
+
+state 54
+	Struct : BRA INFIX6 . KET  (40)
+	Struct : BRA INFIX6 . KET BRA Forms KET  (53)
+
+	KET  shift 89
+	.  error
+
+
+state 55
+	Struct : BRA INFIX7 . KET  (41)
+	Struct : BRA INFIX7 . KET BRA Forms KET  (54)
+
+	KET  shift 90
+	.  error
+
+
+state 56
+	Struct : BRA INFIX8 . KET  (42)
+	Struct : BRA INFIX8 . KET BRA Forms KET  (55)
+
+	KET  shift 91
+	.  error
+
+
+state 57
+	Form : WBRA . Form WKET Form  (20)
+	Struct : BRA WBRA . WKET KET  (46)
+	Struct : BRA WBRA . WKET KET BRA Forms KET  (59)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	WKET  shift 92
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 28
+	Part  goto 21
+	Struct  goto 22
+
+
+state 58
+	Struct : BRA SBRA . SKET KET  (45)
+	Struct : BRA SBRA . SKET KET BRA Forms KET  (58)
+
+	SKET  shift 93
+	.  error
+
+
+state 59
+	Form : Form . INFIX0 Form  (10)
+	Form : Form . INFIX1 Form  (11)
+	Form : Form . INFIX2 Form  (12)
+	Form : Form . INFIX3 Form  (13)
+	Form : Form . INFIX4 Form  (14)
+	Form : Form . INFIX5 Form  (15)
+	Form : Form . INFIX6 Form  (16)
+	Form : Form . INFIX7 Form  (17)
+	Form : Form . INFIX8 Form  (18)
+	Form : Form . SBRA Form SKET  (19)
+	Part : BRA Form . KET  (27)
+
+	INFIX0  shift 64
+	INFIX1  shift 65
+	INFIX2  shift 66
+	INFIX3  shift 67
+	INFIX4  shift 68
+	INFIX5  shift 69
+	INFIX6  shift 70
+	INFIX7  shift 71
+	INFIX8  shift 72
+	SBRA  shift 73
+	KET  shift 94
+	.  error
+
+
+state 60
+	Struct : CBRA CKET .  (33)
+
+	.  reduce 33
+
+
+state 61
+	Forms : Form .  (7)
+	Forms : Form . COMMA Forms  (8)
+	Form : Form . INFIX0 Form  (10)
+	Form : Form . INFIX1 Form  (11)
+	Form : Form . INFIX2 Form  (12)
+	Form : Form . INFIX3 Form  (13)
+	Form : Form . INFIX4 Form  (14)
+	Form : Form . INFIX5 Form  (15)
+	Form : Form . INFIX6 Form  (16)
+	Form : Form . INFIX7 Form  (17)
+	Form : Form . INFIX8 Form  (18)
+	Form : Form . SBRA Form SKET  (19)
+
+	INFIX0  shift 64
+	INFIX1  shift 65
+	INFIX2  shift 66
+	INFIX3  shift 67
+	INFIX4  shift 68
+	INFIX5  shift 69
+	INFIX6  shift 70
+	INFIX7  shift 71
+	INFIX8  shift 72
+	SBRA  shift 73
+	COMMA  shift 74
+	KET  reduce 7
+	CKET  reduce 7
+	DOT  reduce 7
+	QUERY  reduce 7
+
+
+state 62
+	Struct : CBRA Forms . CKET  (32)
+
+	CKET  shift 95
+	.  error
+
+
+state 63
+	cmd : IF Forms . DOT  (4)
+
+	DOT  shift 96
+	.  error
+
+
+state 64
+	Form : Form INFIX0 . Form  (10)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 97
+	Part  goto 21
+	Struct  goto 22
+
+
+state 65
+	Form : Form INFIX1 . Form  (11)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 98
+	Part  goto 21
+	Struct  goto 22
+
+
+state 66
+	Form : Form INFIX2 . Form  (12)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 99
+	Part  goto 21
+	Struct  goto 22
+
+
+state 67
+	Form : Form INFIX3 . Form  (13)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 100
+	Part  goto 21
+	Struct  goto 22
+
+
+state 68
+	Form : Form INFIX4 . Form  (14)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 101
+	Part  goto 21
+	Struct  goto 22
+
+
+state 69
+	Form : Form INFIX5 . Form  (15)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 102
+	Part  goto 21
+	Struct  goto 22
+
+
+state 70
+	Form : Form INFIX6 . Form  (16)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 103
+	Part  goto 21
+	Struct  goto 22
+
+
+state 71
+	Form : Form INFIX7 . Form  (17)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 104
+	Part  goto 21
+	Struct  goto 22
+
+
+state 72
+	Form : Form INFIX8 . Form  (18)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 105
+	Part  goto 21
+	Struct  goto 22
+
+
+state 73
+	Form : Form SBRA . Form SKET  (19)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 106
+	Part  goto 21
+	Struct  goto 22
+
+
+state 74
+	Forms : Form COMMA . Forms  (8)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 61
+	Forms  goto 107
+	Part  goto 21
+	Struct  goto 22
+
+
+state 75
+	cmd : Form IF . DOT  (2)
+	cmd : Form IF . Forms DOT  (3)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	DOT  shift 108
+	.  error
+
+	Form  goto 61
+	Forms  goto 109
+	Part  goto 21
+	Struct  goto 22
+
+
+state 76
+	cmd : Form DOT .  (1)
+
+	.  reduce 1
+
+
+state 77
+	cmd : Forms QUERY .  (5)
+
+	.  reduce 5
+
+
+state 78
+	Struct : ATOM BRA KET .  (31)
+
+	.  reduce 31
+
+
+state 79
+	Struct : ATOM BRA Forms . KET  (30)
+
+	KET  shift 110
+	.  error
+
+
+state 80
+	Form : WBRA Form WKET . Form  (20)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 111
+	Part  goto 21
+	Struct  goto 22
+
+
+state 81
+	Struct : BRA PREFIX KET .  (44)
+	Struct : BRA PREFIX KET . BRA Forms KET  (57)
+
+	BRA  shift 112
+	$end  reduce 44
+	INFIX0  reduce 44
+	INFIX1  reduce 44
+	INFIX2  reduce 44
+	INFIX3  reduce 44
+	INFIX4  reduce 44
+	INFIX5  reduce 44
+	INFIX6  reduce 44
+	INFIX7  reduce 44
+	INFIX8  reduce 44
+	WKET  reduce 44
+	SBRA  reduce 44
+	KET  reduce 44
+	CKET  reduce 44
+	SKET  reduce 44
+	COMMA  reduce 44
+	IF  reduce 44
+	DOT  reduce 44
+	QUERY  reduce 44
+
+
+state 82
+	Struct : BRA NOTFIX KET .  (43)
+	Struct : BRA NOTFIX KET . BRA Forms KET  (56)
+
+	BRA  shift 113
+	$end  reduce 43
+	INFIX0  reduce 43
+	INFIX1  reduce 43
+	INFIX2  reduce 43
+	INFIX3  reduce 43
+	INFIX4  reduce 43
+	INFIX5  reduce 43
+	INFIX6  reduce 43
+	INFIX7  reduce 43
+	INFIX8  reduce 43
+	WKET  reduce 43
+	SBRA  reduce 43
+	KET  reduce 43
+	CKET  reduce 43
+	SKET  reduce 43
+	COMMA  reduce 43
+	IF  reduce 43
+	DOT  reduce 43
+	QUERY  reduce 43
+
+
+state 83
+	Struct : BRA INFIX0 KET .  (34)
+	Struct : BRA INFIX0 KET . BRA Forms KET  (47)
+
+	BRA  shift 114
+	$end  reduce 34
+	INFIX0  reduce 34
+	INFIX1  reduce 34
+	INFIX2  reduce 34
+	INFIX3  reduce 34
+	INFIX4  reduce 34
+	INFIX5  reduce 34
+	INFIX6  reduce 34
+	INFIX7  reduce 34
+	INFIX8  reduce 34
+	WKET  reduce 34
+	SBRA  reduce 34
+	KET  reduce 34
+	CKET  reduce 34
+	SKET  reduce 34
+	COMMA  reduce 34
+	IF  reduce 34
+	DOT  reduce 34
+	QUERY  reduce 34
+
+
+state 84
+	Struct : BRA INFIX1 KET .  (35)
+	Struct : BRA INFIX1 KET . BRA Forms KET  (48)
+
+	BRA  shift 115
+	$end  reduce 35
+	INFIX0  reduce 35
+	INFIX1  reduce 35
+	INFIX2  reduce 35
+	INFIX3  reduce 35
+	INFIX4  reduce 35
+	INFIX5  reduce 35
+	INFIX6  reduce 35
+	INFIX7  reduce 35
+	INFIX8  reduce 35
+	WKET  reduce 35
+	SBRA  reduce 35
+	KET  reduce 35
+	CKET  reduce 35
+	SKET  reduce 35
+	COMMA  reduce 35
+	IF  reduce 35
+	DOT  reduce 35
+	QUERY  reduce 35
+
+
+state 85
+	Struct : BRA INFIX2 KET .  (36)
+	Struct : BRA INFIX2 KET . BRA Forms KET  (49)
+
+	BRA  shift 116
+	$end  reduce 36
+	INFIX0  reduce 36
+	INFIX1  reduce 36
+	INFIX2  reduce 36
+	INFIX3  reduce 36
+	INFIX4  reduce 36
+	INFIX5  reduce 36
+	INFIX6  reduce 36
+	INFIX7  reduce 36
+	INFIX8  reduce 36
+	WKET  reduce 36
+	SBRA  reduce 36
+	KET  reduce 36
+	CKET  reduce 36
+	SKET  reduce 36
+	COMMA  reduce 36
+	IF  reduce 36
+	DOT  reduce 36
+	QUERY  reduce 36
+
+
+state 86
+	Struct : BRA INFIX3 KET .  (37)
+	Struct : BRA INFIX3 KET . BRA Forms KET  (50)
+
+	BRA  shift 117
+	$end  reduce 37
+	INFIX0  reduce 37
+	INFIX1  reduce 37
+	INFIX2  reduce 37
+	INFIX3  reduce 37
+	INFIX4  reduce 37
+	INFIX5  reduce 37
+	INFIX6  reduce 37
+	INFIX7  reduce 37
+	INFIX8  reduce 37
+	WKET  reduce 37
+	SBRA  reduce 37
+	KET  reduce 37
+	CKET  reduce 37
+	SKET  reduce 37
+	COMMA  reduce 37
+	IF  reduce 37
+	DOT  reduce 37
+	QUERY  reduce 37
+
+
+state 87
+	Struct : BRA INFIX4 KET .  (38)
+	Struct : BRA INFIX4 KET . BRA Forms KET  (51)
+
+	BRA  shift 118
+	$end  reduce 38
+	INFIX0  reduce 38
+	INFIX1  reduce 38
+	INFIX2  reduce 38
+	INFIX3  reduce 38
+	INFIX4  reduce 38
+	INFIX5  reduce 38
+	INFIX6  reduce 38
+	INFIX7  reduce 38
+	INFIX8  reduce 38
+	WKET  reduce 38
+	SBRA  reduce 38
+	KET  reduce 38
+	CKET  reduce 38
+	SKET  reduce 38
+	COMMA  reduce 38
+	IF  reduce 38
+	DOT  reduce 38
+	QUERY  reduce 38
+
+
+state 88
+	Struct : BRA INFIX5 KET .  (39)
+	Struct : BRA INFIX5 KET . BRA Forms KET  (52)
+
+	BRA  shift 119
+	$end  reduce 39
+	INFIX0  reduce 39
+	INFIX1  reduce 39
+	INFIX2  reduce 39
+	INFIX3  reduce 39
+	INFIX4  reduce 39
+	INFIX5  reduce 39
+	INFIX6  reduce 39
+	INFIX7  reduce 39
+	INFIX8  reduce 39
+	WKET  reduce 39
+	SBRA  reduce 39
+	KET  reduce 39
+	CKET  reduce 39
+	SKET  reduce 39
+	COMMA  reduce 39
+	IF  reduce 39
+	DOT  reduce 39
+	QUERY  reduce 39
+
+
+state 89
+	Struct : BRA INFIX6 KET .  (40)
+	Struct : BRA INFIX6 KET . BRA Forms KET  (53)
+
+	BRA  shift 120
+	$end  reduce 40
+	INFIX0  reduce 40
+	INFIX1  reduce 40
+	INFIX2  reduce 40
+	INFIX3  reduce 40
+	INFIX4  reduce 40
+	INFIX5  reduce 40
+	INFIX6  reduce 40
+	INFIX7  reduce 40
+	INFIX8  reduce 40
+	WKET  reduce 40
+	SBRA  reduce 40
+	KET  reduce 40
+	CKET  reduce 40
+	SKET  reduce 40
+	COMMA  reduce 40
+	IF  reduce 40
+	DOT  reduce 40
+	QUERY  reduce 40
+
+
+state 90
+	Struct : BRA INFIX7 KET .  (41)
+	Struct : BRA INFIX7 KET . BRA Forms KET  (54)
+
+	BRA  shift 121
+	$end  reduce 41
+	INFIX0  reduce 41
+	INFIX1  reduce 41
+	INFIX2  reduce 41
+	INFIX3  reduce 41
+	INFIX4  reduce 41
+	INFIX5  reduce 41
+	INFIX6  reduce 41
+	INFIX7  reduce 41
+	INFIX8  reduce 41
+	WKET  reduce 41
+	SBRA  reduce 41
+	KET  reduce 41
+	CKET  reduce 41
+	SKET  reduce 41
+	COMMA  reduce 41
+	IF  reduce 41
+	DOT  reduce 41
+	QUERY  reduce 41
+
+
+state 91
+	Struct : BRA INFIX8 KET .  (42)
+	Struct : BRA INFIX8 KET . BRA Forms KET  (55)
+
+	BRA  shift 122
+	$end  reduce 42
+	INFIX0  reduce 42
+	INFIX1  reduce 42
+	INFIX2  reduce 42
+	INFIX3  reduce 42
+	INFIX4  reduce 42
+	INFIX5  reduce 42
+	INFIX6  reduce 42
+	INFIX7  reduce 42
+	INFIX8  reduce 42
+	WKET  reduce 42
+	SBRA  reduce 42
+	KET  reduce 42
+	CKET  reduce 42
+	SKET  reduce 42
+	COMMA  reduce 42
+	IF  reduce 42
+	DOT  reduce 42
+	QUERY  reduce 42
+
+
+state 92
+	Struct : BRA WBRA WKET . KET  (46)
+	Struct : BRA WBRA WKET . KET BRA Forms KET  (59)
+
+	KET  shift 123
+	.  error
+
+
+state 93
+	Struct : BRA SBRA SKET . KET  (45)
+	Struct : BRA SBRA SKET . KET BRA Forms KET  (58)
+
+	KET  shift 124
+	.  error
+
+
+state 94
+	Part : BRA Form KET .  (27)
+
+	.  reduce 27
+
+
+state 95
+	Struct : CBRA Forms CKET .  (32)
+
+	.  reduce 32
+
+
+state 96
+	cmd : IF Forms DOT .  (4)
+
+	.  reduce 4
+
+
+state 97
+	Form : Form . INFIX0 Form  (10)
+	Form : Form INFIX0 Form .  (10)
+	Form : Form . INFIX1 Form  (11)
+	Form : Form . INFIX2 Form  (12)
+	Form : Form . INFIX3 Form  (13)
+	Form : Form . INFIX4 Form  (14)
+	Form : Form . INFIX5 Form  (15)
+	Form : Form . INFIX6 Form  (16)
+	Form : Form . INFIX7 Form  (17)
+	Form : Form . INFIX8 Form  (18)
+	Form : Form . SBRA Form SKET  (19)
+
+	INFIX0  shift 64
+	INFIX1  shift 65
+	INFIX2  shift 66
+	INFIX3  shift 67
+	INFIX4  shift 68
+	INFIX5  shift 69
+	INFIX6  shift 70
+	INFIX7  shift 71
+	INFIX8  shift 72
+	SBRA  shift 73
+	$end  reduce 10
+	WKET  reduce 10
+	KET  reduce 10
+	CKET  reduce 10
+	SKET  reduce 10
+	COMMA  reduce 10
+	IF  reduce 10
+	DOT  reduce 10
+	QUERY  reduce 10
+
+
+state 98
+	Form : Form . INFIX0 Form  (10)
+	Form : Form . INFIX1 Form  (11)
+	Form : Form INFIX1 Form .  (11)
+	Form : Form . INFIX2 Form  (12)
+	Form : Form . INFIX3 Form  (13)
+	Form : Form . INFIX4 Form  (14)
+	Form : Form . INFIX5 Form  (15)
+	Form : Form . INFIX6 Form  (16)
+	Form : Form . INFIX7 Form  (17)
+	Form : Form . INFIX8 Form  (18)
+	Form : Form . SBRA Form SKET  (19)
+
+	INFIX1  shift 65
+	INFIX2  shift 66
+	INFIX3  shift 67
+	INFIX4  shift 68
+	INFIX5  shift 69
+	INFIX6  shift 70
+	INFIX7  shift 71
+	INFIX8  shift 72
+	SBRA  shift 73
+	$end  reduce 11
+	INFIX0  reduce 11
+	WKET  reduce 11
+	KET  reduce 11
+	CKET  reduce 11
+	SKET  reduce 11
+	COMMA  reduce 11
+	IF  reduce 11
+	DOT  reduce 11
+	QUERY  reduce 11
+
+
+state 99
+	Form : Form . INFIX0 Form  (10)
+	Form : Form . INFIX1 Form  (11)
+	Form : Form . INFIX2 Form  (12)
+	Form : Form INFIX2 Form .  (12)
+	Form : Form . INFIX3 Form  (13)
+	Form : Form . INFIX4 Form  (14)
+	Form : Form . INFIX5 Form  (15)
+	Form : Form . INFIX6 Form  (16)
+	Form : Form . INFIX7 Form  (17)
+	Form : Form . INFIX8 Form  (18)
+	Form : Form . SBRA Form SKET  (19)
+
+	INFIX2  shift 66
+	INFIX3  shift 67
+	INFIX4  shift 68
+	INFIX5  shift 69
+	INFIX6  shift 70
+	INFIX7  shift 71
+	INFIX8  shift 72
+	SBRA  shift 73
+	$end  reduce 12
+	INFIX0  reduce 12
+	INFIX1  reduce 12
+	WKET  reduce 12
+	KET  reduce 12
+	CKET  reduce 12
+	SKET  reduce 12
+	COMMA  reduce 12
+	IF  reduce 12
+	DOT  reduce 12
+	QUERY  reduce 12
+
+
+state 100
+	Form : Form . INFIX0 Form  (10)
+	Form : Form . INFIX1 Form  (11)
+	Form : Form . INFIX2 Form  (12)
+	Form : Form . INFIX3 Form  (13)
+	Form : Form INFIX3 Form .  (13)
+	Form : Form . INFIX4 Form  (14)
+	Form : Form . INFIX5 Form  (15)
+	Form : Form . INFIX6 Form  (16)
+	Form : Form . INFIX7 Form  (17)
+	Form : Form . INFIX8 Form  (18)
+	Form : Form . SBRA Form SKET  (19)
+
+	INFIX3  shift 67
+	INFIX4  shift 68
+	INFIX5  shift 69
+	INFIX6  shift 70
+	INFIX7  shift 71
+	INFIX8  shift 72
+	SBRA  shift 73
+	$end  reduce 13
+	INFIX0  reduce 13
+	INFIX1  reduce 13
+	INFIX2  reduce 13
+	WKET  reduce 13
+	KET  reduce 13
+	CKET  reduce 13
+	SKET  reduce 13
+	COMMA  reduce 13
+	IF  reduce 13
+	DOT  reduce 13
+	QUERY  reduce 13
+
+
+state 101
+	Form : Form . INFIX0 Form  (10)
+	Form : Form . INFIX1 Form  (11)
+	Form : Form . INFIX2 Form  (12)
+	Form : Form . INFIX3 Form  (13)
+	Form : Form . INFIX4 Form  (14)
+	Form : Form INFIX4 Form .  (14)
+	Form : Form . INFIX5 Form  (15)
+	Form : Form . INFIX6 Form  (16)
+	Form : Form . INFIX7 Form  (17)
+	Form : Form . INFIX8 Form  (18)
+	Form : Form . SBRA Form SKET  (19)
+
+	INFIX4  shift 68
+	INFIX5  shift 69
+	INFIX6  shift 70
+	INFIX7  shift 71
+	INFIX8  shift 72
+	SBRA  shift 73
+	$end  reduce 14
+	INFIX0  reduce 14
+	INFIX1  reduce 14
+	INFIX2  reduce 14
+	INFIX3  reduce 14
+	WKET  reduce 14
+	KET  reduce 14
+	CKET  reduce 14
+	SKET  reduce 14
+	COMMA  reduce 14
+	IF  reduce 14
+	DOT  reduce 14
+	QUERY  reduce 14
+
+
+state 102
+	Form : Form . INFIX0 Form  (10)
+	Form : Form . INFIX1 Form  (11)
+	Form : Form . INFIX2 Form  (12)
+	Form : Form . INFIX3 Form  (13)
+	Form : Form . INFIX4 Form  (14)
+	Form : Form . INFIX5 Form  (15)
+	Form : Form INFIX5 Form .  (15)
+	Form : Form . INFIX6 Form  (16)
+	Form : Form . INFIX7 Form  (17)
+	Form : Form . INFIX8 Form  (18)
+	Form : Form . SBRA Form SKET  (19)
+
+	INFIX5  shift 69
+	INFIX6  shift 70
+	INFIX7  shift 71
+	INFIX8  shift 72
+	SBRA  shift 73
+	$end  reduce 15
+	INFIX0  reduce 15
+	INFIX1  reduce 15
+	INFIX2  reduce 15
+	INFIX3  reduce 15
+	INFIX4  reduce 15
+	WKET  reduce 15
+	KET  reduce 15
+	CKET  reduce 15
+	SKET  reduce 15
+	COMMA  reduce 15
+	IF  reduce 15
+	DOT  reduce 15
+	QUERY  reduce 15
+
+
+state 103
+	Form : Form . INFIX0 Form  (10)
+	Form : Form . INFIX1 Form  (11)
+	Form : Form . INFIX2 Form  (12)
+	Form : Form . INFIX3 Form  (13)
+	Form : Form . INFIX4 Form  (14)
+	Form : Form . INFIX5 Form  (15)
+	Form : Form . INFIX6 Form  (16)
+	Form : Form INFIX6 Form .  (16)
+	Form : Form . INFIX7 Form  (17)
+	Form : Form . INFIX8 Form  (18)
+	Form : Form . SBRA Form SKET  (19)
+
+	INFIX6  shift 70
+	INFIX7  shift 71
+	INFIX8  shift 72
+	SBRA  shift 73
+	$end  reduce 16
+	INFIX0  reduce 16
+	INFIX1  reduce 16
+	INFIX2  reduce 16
+	INFIX3  reduce 16
+	INFIX4  reduce 16
+	INFIX5  reduce 16
+	WKET  reduce 16
+	KET  reduce 16
+	CKET  reduce 16
+	SKET  reduce 16
+	COMMA  reduce 16
+	IF  reduce 16
+	DOT  reduce 16
+	QUERY  reduce 16
+
+
+state 104
+	Form : Form . INFIX0 Form  (10)
+	Form : Form . INFIX1 Form  (11)
+	Form : Form . INFIX2 Form  (12)
+	Form : Form . INFIX3 Form  (13)
+	Form : Form . INFIX4 Form  (14)
+	Form : Form . INFIX5 Form  (15)
+	Form : Form . INFIX6 Form  (16)
+	Form : Form . INFIX7 Form  (17)
+	Form : Form INFIX7 Form .  (17)
+	Form : Form . INFIX8 Form  (18)
+	Form : Form . SBRA Form SKET  (19)
+
+	INFIX7  shift 71
+	INFIX8  shift 72
+	SBRA  shift 73
+	$end  reduce 17
+	INFIX0  reduce 17
+	INFIX1  reduce 17
+	INFIX2  reduce 17
+	INFIX3  reduce 17
+	INFIX4  reduce 17
+	INFIX5  reduce 17
+	INFIX6  reduce 17
+	WKET  reduce 17
+	KET  reduce 17
+	CKET  reduce 17
+	SKET  reduce 17
+	COMMA  reduce 17
+	IF  reduce 17
+	DOT  reduce 17
+	QUERY  reduce 17
+
+
+state 105
+	Form : Form . INFIX0 Form  (10)
+	Form : Form . INFIX1 Form  (11)
+	Form : Form . INFIX2 Form  (12)
+	Form : Form . INFIX3 Form  (13)
+	Form : Form . INFIX4 Form  (14)
+	Form : Form . INFIX5 Form  (15)
+	Form : Form . INFIX6 Form  (16)
+	Form : Form . INFIX7 Form  (17)
+	Form : Form . INFIX8 Form  (18)
+	Form : Form INFIX8 Form .  (18)
+	Form : Form . SBRA Form SKET  (19)
+
+	SBRA  shift 73
+	$end  reduce 18
+	INFIX0  reduce 18
+	INFIX1  reduce 18
+	INFIX2  reduce 18
+	INFIX3  reduce 18
+	INFIX4  reduce 18
+	INFIX5  reduce 18
+	INFIX6  reduce 18
+	INFIX7  reduce 18
+	INFIX8  reduce 18
+	WKET  reduce 18
+	KET  reduce 18
+	CKET  reduce 18
+	SKET  reduce 18
+	COMMA  reduce 18
+	IF  reduce 18
+	DOT  reduce 18
+	QUERY  reduce 18
+
+
+state 106
+	Form : Form . INFIX0 Form  (10)
+	Form : Form . INFIX1 Form  (11)
+	Form : Form . INFIX2 Form  (12)
+	Form : Form . INFIX3 Form  (13)
+	Form : Form . INFIX4 Form  (14)
+	Form : Form . INFIX5 Form  (15)
+	Form : Form . INFIX6 Form  (16)
+	Form : Form . INFIX7 Form  (17)
+	Form : Form . INFIX8 Form  (18)
+	Form : Form . SBRA Form SKET  (19)
+	Form : Form SBRA Form . SKET  (19)
+
+	INFIX0  shift 64
+	INFIX1  shift 65
+	INFIX2  shift 66
+	INFIX3  shift 67
+	INFIX4  shift 68
+	INFIX5  shift 69
+	INFIX6  shift 70
+	INFIX7  shift 71
+	INFIX8  shift 72
+	SBRA  shift 73
+	SKET  shift 125
+	.  error
+
+
+state 107
+	Forms : Form COMMA Forms .  (8)
+
+	.  reduce 8
+
+
+state 108
+	cmd : Form IF DOT .  (2)
+
+	.  reduce 2
+
+
+state 109
+	cmd : Form IF Forms . DOT  (3)
+
+	DOT  shift 126
+	.  error
+
+
+state 110
+	Struct : ATOM BRA Forms KET .  (30)
+
+	.  reduce 30
+
+
+state 111
+	Form : Form . INFIX0 Form  (10)
+	Form : Form . INFIX1 Form  (11)
+	Form : Form . INFIX2 Form  (12)
+	Form : Form . INFIX3 Form  (13)
+	Form : Form . INFIX4 Form  (14)
+	Form : Form . INFIX5 Form  (15)
+	Form : Form . INFIX6 Form  (16)
+	Form : Form . INFIX7 Form  (17)
+	Form : Form . INFIX8 Form  (18)
+	Form : Form . SBRA Form SKET  (19)
+	Form : WBRA Form WKET Form .  (20)
+
+	SBRA  shift 73
+	$end  reduce 20
+	INFIX0  reduce 20
+	INFIX1  reduce 20
+	INFIX2  reduce 20
+	INFIX3  reduce 20
+	INFIX4  reduce 20
+	INFIX5  reduce 20
+	INFIX6  reduce 20
+	INFIX7  reduce 20
+	INFIX8  reduce 20
+	WKET  reduce 20
+	KET  reduce 20
+	CKET  reduce 20
+	SKET  reduce 20
+	COMMA  reduce 20
+	IF  reduce 20
+	DOT  reduce 20
+	QUERY  reduce 20
+
+
+state 112
+	Struct : BRA PREFIX KET BRA . Forms KET  (57)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 61
+	Forms  goto 127
+	Part  goto 21
+	Struct  goto 22
+
+
+state 113
+	Struct : BRA NOTFIX KET BRA . Forms KET  (56)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 61
+	Forms  goto 128
+	Part  goto 21
+	Struct  goto 22
+
+
+state 114
+	Struct : BRA INFIX0 KET BRA . Forms KET  (47)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 61
+	Forms  goto 129
+	Part  goto 21
+	Struct  goto 22
+
+
+state 115
+	Struct : BRA INFIX1 KET BRA . Forms KET  (48)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 61
+	Forms  goto 130
+	Part  goto 21
+	Struct  goto 22
+
+
+state 116
+	Struct : BRA INFIX2 KET BRA . Forms KET  (49)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 61
+	Forms  goto 131
+	Part  goto 21
+	Struct  goto 22
+
+
+state 117
+	Struct : BRA INFIX3 KET BRA . Forms KET  (50)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 61
+	Forms  goto 132
+	Part  goto 21
+	Struct  goto 22
+
+
+state 118
+	Struct : BRA INFIX4 KET BRA . Forms KET  (51)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 61
+	Forms  goto 133
+	Part  goto 21
+	Struct  goto 22
+
+
+state 119
+	Struct : BRA INFIX5 KET BRA . Forms KET  (52)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 61
+	Forms  goto 134
+	Part  goto 21
+	Struct  goto 22
+
+
+state 120
+	Struct : BRA INFIX6 KET BRA . Forms KET  (53)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 61
+	Forms  goto 135
+	Part  goto 21
+	Struct  goto 22
+
+
+state 121
+	Struct : BRA INFIX7 KET BRA . Forms KET  (54)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 61
+	Forms  goto 136
+	Part  goto 21
+	Struct  goto 22
+
+
+state 122
+	Struct : BRA INFIX8 KET BRA . Forms KET  (55)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 61
+	Forms  goto 137
+	Part  goto 21
+	Struct  goto 22
+
+
+state 123
+	Struct : BRA WBRA WKET KET .  (46)
+	Struct : BRA WBRA WKET KET . BRA Forms KET  (59)
+
+	BRA  shift 138
+	$end  reduce 46
+	INFIX0  reduce 46
+	INFIX1  reduce 46
+	INFIX2  reduce 46
+	INFIX3  reduce 46
+	INFIX4  reduce 46
+	INFIX5  reduce 46
+	INFIX6  reduce 46
+	INFIX7  reduce 46
+	INFIX8  reduce 46
+	WKET  reduce 46
+	SBRA  reduce 46
+	KET  reduce 46
+	CKET  reduce 46
+	SKET  reduce 46
+	COMMA  reduce 46
+	IF  reduce 46
+	DOT  reduce 46
+	QUERY  reduce 46
+
+
+state 124
+	Struct : BRA SBRA SKET KET .  (45)
+	Struct : BRA SBRA SKET KET . BRA Forms KET  (58)
+
+	BRA  shift 139
+	$end  reduce 45
+	INFIX0  reduce 45
+	INFIX1  reduce 45
+	INFIX2  reduce 45
+	INFIX3  reduce 45
+	INFIX4  reduce 45
+	INFIX5  reduce 45
+	INFIX6  reduce 45
+	INFIX7  reduce 45
+	INFIX8  reduce 45
+	WKET  reduce 45
+	SBRA  reduce 45
+	KET  reduce 45
+	CKET  reduce 45
+	SKET  reduce 45
+	COMMA  reduce 45
+	IF  reduce 45
+	DOT  reduce 45
+	QUERY  reduce 45
+
+
+state 125
+	Form : Form SBRA Form SKET .  (19)
+
+	.  reduce 19
+
+
+state 126
+	cmd : Form IF Forms DOT .  (3)
+
+	.  reduce 3
+
+
+state 127
+	Struct : BRA PREFIX KET BRA Forms . KET  (57)
+
+	KET  shift 140
+	.  error
+
+
+state 128
+	Struct : BRA NOTFIX KET BRA Forms . KET  (56)
+
+	KET  shift 141
+	.  error
+
+
+state 129
+	Struct : BRA INFIX0 KET BRA Forms . KET  (47)
+
+	KET  shift 142
+	.  error
+
+
+state 130
+	Struct : BRA INFIX1 KET BRA Forms . KET  (48)
+
+	KET  shift 143
+	.  error
+
+
+state 131
+	Struct : BRA INFIX2 KET BRA Forms . KET  (49)
+
+	KET  shift 144
+	.  error
+
+
+state 132
+	Struct : BRA INFIX3 KET BRA Forms . KET  (50)
+
+	KET  shift 145
+	.  error
+
+
+state 133
+	Struct : BRA INFIX4 KET BRA Forms . KET  (51)
+
+	KET  shift 146
+	.  error
+
+
+state 134
+	Struct : BRA INFIX5 KET BRA Forms . KET  (52)
+
+	KET  shift 147
+	.  error
+
+
+state 135
+	Struct : BRA INFIX6 KET BRA Forms . KET  (53)
+
+	KET  shift 148
+	.  error
+
+
+state 136
+	Struct : BRA INFIX7 KET BRA Forms . KET  (54)
+
+	KET  shift 149
+	.  error
+
+
+state 137
+	Struct : BRA INFIX8 KET BRA Forms . KET  (55)
+
+	KET  shift 150
+	.  error
+
+
+state 138
+	Struct : BRA WBRA WKET KET BRA . Forms KET  (59)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 61
+	Forms  goto 151
+	Part  goto 21
+	Struct  goto 22
+
+
+state 139
+	Struct : BRA SBRA SKET KET BRA . Forms KET  (58)
+
+	error  shift 4
+	NAME  shift 5
+	ATOM  shift 6
+	PREFIX  shift 7
+	NOTFIX  shift 8
+	WBRA  shift 9
+	NUM  shift 10
+	STRING  shift 11
+	BRA  shift 13
+	CBRA  shift 14
+	.  error
+
+	Form  goto 61
+	Forms  goto 152
+	Part  goto 21
+	Struct  goto 22
+
+
+state 140
+	Struct : BRA PREFIX KET BRA Forms KET .  (57)
+
+	.  reduce 57
+
+
+state 141
+	Struct : BRA NOTFIX KET BRA Forms KET .  (56)
+
+	.  reduce 56
+
+
+state 142
+	Struct : BRA INFIX0 KET BRA Forms KET .  (47)
+
+	.  reduce 47
+
+
+state 143
+	Struct : BRA INFIX1 KET BRA Forms KET .  (48)
+
+	.  reduce 48
+
+
+state 144
+	Struct : BRA INFIX2 KET BRA Forms KET .  (49)
+
+	.  reduce 49
+
+
+state 145
+	Struct : BRA INFIX3 KET BRA Forms KET .  (50)
+
+	.  reduce 50
+
+
+state 146
+	Struct : BRA INFIX4 KET BRA Forms KET .  (51)
+
+	.  reduce 51
+
+
+state 147
+	Struct : BRA INFIX5 KET BRA Forms KET .  (52)
+
+	.  reduce 52
+
+
+state 148
+	Struct : BRA INFIX6 KET BRA Forms KET .  (53)
+
+	.  reduce 53
+
+
+state 149
+	Struct : BRA INFIX7 KET BRA Forms KET .  (54)
+
+	.  reduce 54
+
+
+state 150
+	Struct : BRA INFIX8 KET BRA Forms KET .  (55)
+
+	.  reduce 55
+
+
+state 151
+	Struct : BRA WBRA WKET KET BRA Forms . KET  (59)
+
+	KET  shift 153
+	.  error
+
+
+state 152
+	Struct : BRA SBRA SKET KET BRA Forms . KET  (58)
+
+	KET  shift 154
+	.  error
+
+
+state 153
+	Struct : BRA WBRA WKET KET BRA Forms KET .  (59)
+
+	.  reduce 59
+
+
+state 154
+	Struct : BRA SBRA SKET KET BRA Forms KET .  (58)
+
+	.  reduce 58
+
+
+33 terminals, 9 nonterminals
+81 grammar rules, 155 states

@@ -1,0 +1,2038 @@
+\documentclass{popl}
+\def\user#1{{#1}}
+\def\Return{{\scriptsize\tt\user{<Return>}}}
+\def\Entailed{\mathrel{:\!\!-}}
+%
+%%\RCS    $Id: proglang0.tex,v 1.13 2000/02/17 00:12:14 sufrin Exp sufrin $
+%%\RCS    $Revision: 1.13 $
+%%\date{Version \RCSRevision \today\ \now}
+\date{Version of 17th February, 2000}
+\title{Introduction to Programming  Languages \\ Logic Programming}
+\subtitle{I2 (PL): Introduction \& Logic Programming}
+\author{Bernard Sufrin}
+%
+%
+%
+\newenvironment{smalltt}{\begin{alltt}\smaller}{\end{alltt}}
+\newcommand{\rmbox}[1]{\mbox{{\rm #1}}}
+\newenvironment{derive}{$$\begin{tabular}{ll}}{\end{tabular}$$}
+\newcommand{\holds}[1]{&{\tt\smaller #1}\\}
+\newcommand{\when}[1]{$\Leftarrow$&~~~{\tt\smaller\{#1\}}\\}
+\def\HOLDS#1...{&{\tt\smaller #1}\\}
+\def\WHEN#1...{$\Leftarrow$&~~~{\tt\smaller\{#1\}}\\}
+\def\WHENN#1...{$\Leftrightarrow$&~~~{\tt\smaller\{#1\}}\\}
+\def\compose{\mathop{\circ}}
+%-----------------------------------------------------------------------------------------------
+\def\sig#1{\(\sigma\)\textrm{ is }#1}
+\def\succeeds{\textrm{\textbf{succeeds}}}
+\def\fails{\textrm{\textbf{fails}}}
+%-----------------------------------------------------------------------------------------------
+\def\LogPro{{\ttfamily\slshape LogPro}\xspace}
+\def\Prolog{{\ttfamily\slshape Prolog}\xspace}
+%-----------------------------------------------------------------------------------------------
+%
+%
+%
+\begin{document}
+%-----------------------------------------------------------------------------------------------
+\begin{foil}
+\begin{cframed}
+The Study of Programming Languages 
+\end{cframed}
+
+\begin{itemize}
+\item Syntax    -- about structure (form) of phrases
+\begin{itemize}
+\item Concrete Syntax -- written form (strings)
+\item Abstract Syntax -- essential structure (trees)
+\end{itemize}
+\item {\bf Semantics -- about meaning}
+\item Pragmatics -- about implementation methods, useability, reliability, ...
+\end{itemize}
+\begin{note}
+``Part of the unique attraction of computer science stems from the fact
+that most of its notions permit a multitude of simultaneous
+perspectives, connecting form and content, theory and practice, etc.
+Thus, the study of programming involves syntax, semantics, and
+pragmatics. Syntactically, a program can be specified by grammar
+formalisms on several levels.  Semantically, a program can be
+characterized as a static entity such as a mathematical model and by
+dynamic computations such as derivation traces.  Pragmatically, a
+program can be run by an interpreter, in an abstract machine, and as
+native code of a real computer. In order to obtain insights into new
+programming paradigms one can start off from either of these ends or
+from somewhere in the middle.'' (Harold Boley) 
+\end{note}
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{cframed}[5in]
+Why bother to study programming language{\bf \underline{s}} systematically?
+\end{cframed}
+
+\begin{itemize}
+        \item When we use a language we don't want to be a victim of its quirks.
+        \item When we set out to design a language we need to know what choices we can make.
+\begin{note}
+Even though  most of us will never design a fully-fledged
+programming language the fact remains that ``little'' languages
+are everywhere. Some obvious examples that spring immediately to
+mind are: (a) the language design implicit in the choices made
+by the designer of any GUI, (b) the query languages to be found
+in most database systems, (c) the search language to be 
+found in most mail user agents.
+\end{note}
+\end{itemize}
+\end{foil}
+
+
+%-----------------------------------------------------------------------------------------------
+\def\EG{{\it e.g.}\xspace}
+\def\Q (#1){\item{\it #1}?}
+\def\items{\\}
+\begin{foil} 
+\begin{cframed} 
+Some important questions
+\end{cframed}
+
+Declarative {\em versus} Imperative?
+\begin{itemize}
+\item Declarative      -- ``What''
+
+Programmer describes problems, 
+and/or the relationships between problems 
+and solutions.
+
+\item Imperative       -- ``How'' 
+
+Programmer gives instructions which indicate precisely how to
+compute solutions to problems.
+
+
+In reality there is a spectrum.....
+\end{itemize} 
+
+\begin{note} 
+These are opposite ends of a (long) spectrum: most  programming
+languages are neither purely imperative nor purely declarative.
+Many declarative languages have (either explicitly or implictly)
+imperative features -- for example the input/output facilities
+of Haskell. Moreover most high-level imperative languages have
+declarative features -- expression evaluation is the most
+obvious place where we specify the what rather than the how.
+\end{note}
+
+
+\end{foil}
+
+\begin{foil} 
+Questions concerning computational content
+\begin{itemize}
+        \Q (Are operations naturally encapsulated with data)
+        \items Procedure-Oriented: (\EG Pascal, C, Modula II, CAML)  
+        \items Object-Oriented: (\EG  Java, C$^{++}$, Oberon, Modula III, OCAML)
+
+        \Q (Can operations be treated as data)
+        \items  First-order: (\EG Obj, FP, Tcl)
+        \items  Higher-order: (\EG (O)CAML, Haskell)
+        
+        \Q (Are expressions evaluated at most once \& when needed)
+        \items  Strict: (\EG (O)CAML)
+        \items  Lazy: (\EG Haskell, Prolog)
+        
+        \Q (Do non-local variables acquire their meaning at definition time or at invocation time)
+        \items  Static Binding: (\EG C, C$^{++}$, Scheme, Haskell)
+        \items  Dynamic Binding: (\EG Postscript, TeX, Lisp)
+
+        \Q (Does computation implicitly involve search)
+        \items  Functional: (\EG Haskell, Lisp, Scheme, FP)
+        \items  Logical/Relational: (\EG Prolog, Mercury, Andorra)
+\end{itemize}
+
+\end{foil}
+
+\begin{foil} 
+
+Questions concerning modularity
+\begin{itemize}
+        \Q (How straightforward  is ``implementation hiding'')
+        \items  Straightforward:        (\EG Haskell, Modula, Java, (O)CAML)
+        \items  Awkward:                (\EG C, Postscript, Lisp, Scheme)
+
+
+        \item   {\it How does the language support code re-use?}
+        \items  Inheritance: classes can be extended (\EG Java, OCAML, Eiffel)
+        \items  Genericity:  modules can have parameters (\EG OCAML, Eiffel)
+\end{itemize}
+\end{foil}
+
+\begin{foil} 
+Questions concerning types
+\begin{itemize}
+
+        \Q (Is type consistency checked as late as possible)
+        \items  Static Typing:          (\EG Java, Eiffel, OCAML, CAML, Pascal)
+        \items  Dynamic Typing:         (\EG Scheme, Lisp)
+
+        \item {\it How does the language support the definition of operations with type-dependent meanings?}
+        \begin{itemize}
+              \item   Ad-hoc  Polymorphism
+              \item   Parametric Polymorphism 
+              \item   Type Classes  
+              \item   Abstract (Virtual) Class Members  
+        \end{itemize}
+\end{itemize}
+\end{foil}
+
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil}\smaller
+Course Plan:
+\begin{enumerate}
+\item Logic Programming
+\item Interpreters and Operational Semantics 
+\item Understanding Type Systems and Type Inference
+\item Understanding Modules and Classes
+\item From lambda calculus to functional programming \\(2 supplementary lectures: 1999/2000 only)
+\end{enumerate}
+
+Background reading on Prolog (in order of preference):
+\begin{itemize}
+\item Leon Sterling and Ehud Shapiro: the Art of Prolog {\it MIT Press, 1994}.
+(Especially Chapters 1-3, 6-9). This book is encyclop{\ae}dic in its coverage.
+
+\item Michael Spivey: An Introduction to Logic Programming through Prolog. 
+{\it Prentice-Hall International, 1996}. 
+(A lucid and helpful introduction to principles and semantics of Prolog, 
+together with an implementation description).
+
+\item Ivan Bratko: Prolog Programming for Artificial Intelligence. 
+{\it Addison-Wesley, 1995}
+\end{itemize}
+
+Background reading for the rest of the course:
+\begin{itemize}
+\item Ravi Sethi: Programming Languages, Concepts and Constructs.
+{\it Addison Wesley, 1990} (An underappreciated book.)
+
+and perhaps
+
+\item Carlo Ghezzi, Mehdi Jazayeri: Programming Language Concepts. 
+{\it John Wiley, 1997} (A little too anecdotal for my taste, but at least it is
+still in print.)
+
+You may also find useful -- though they don't cover exactly the same material
+
+\item Course notes written by Oege de Moor for 
+``Principles of Programming Languages, Part II'' -- an ancestor of this course. 
+\end{itemize}
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{cframed}
+Declarative Programming
+\end{cframed}
+
+Describing problems and solutions
+\begin{itemize}
+
+\item As relations (logic programming)
+\begin{smalltt}
+    greataunt(X, Y)  if 
+       exists Z . grandparent(X, Z) and sister(Z, Y).
+    
+    isrot(US, VS) if 
+       exists XS, YS . XS++YS=US and YS++XS=VS
+\end{smalltt}
+
+\item As functions (functional programming)
+\begin{smalltt}
+    greataunt(x, y)  = y `elem` map sister (grandparents x)
+    
+    isrotation(u, v) = v `elem` rots u
+    
+    rots  xs     = zipWith (++) (tails xs) (inits xs)
+    inits []     = [[]]
+    inits (x:xs) = []: map (x:) (inits xs)
+    tails []     = [[]]
+    tails (x:xs) = (x:xs): tails xs
+\end{smalltt}
+\end{itemize}
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{cframed}
+Logic Programming
+\end{cframed}
+
+\begin{itemize}
+\item {\bf{Prolog}} was the first Logic-Programming Language, 
+      and is the most widely known and implemented, though not completely
+      standardized.
+
+\item Logic Programming is based on computation by deduction
+
+\begin{note}
+There are many implementations of Prolog, some of which are very
+fast. There is no Prolog language standard, so in this course
+we will use two interpreted implementations developed at Oxford.
+
+\begin{tabular}{lll}          
+        {\sc PicoProlog}& fast, superbly-documented Pascal implementation, austere\\
+        {\sc \LogPro}    & slow, concise CAML implementation 
+\end{tabular}
+\end{note}
+
+\item Relations can be specified so that automated deduction is possible.
+
+\item Eg:  {\smaller {\tt append(XS, YS, ZS)} meaning $XS++YS=ZS$}
+
+\begin{smalltt}
+
+    append(nil,  YS, YS)   :- .
+    append(X:XS, YS, X:ZS) :- append(XS, YS, ZS).
+\end{smalltt} 
+\begin{note}
+The first clause means ``appending $nil$ to $YS$ yields $YS$.'' 
+
+The second clause means
+``Appending $X:XS$ to $YS$ yields $X:ZS$ if appending $XS$ to $YS$ yields $ZS$.''
+\end{note}
+
+\item Eg: {\smaller {\tt isrot(XS, YS)} meaning  
+$\exists US, VS \cdot \(XS&=&US++VS &\land\\ YS&=&VS++US\)$}
+
+\begin{smalltt}
+
+    isrot(XS, YS) :- append(US, VS, XS), append(VS, US, YS).
+\end{smalltt}
+\end{itemize}
+\end{foil}
+
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{itemize}
+\item Proving a fact about {\tt append}  by deduction is straightforward
+\begin{derive}
+        \holds{append(1:2:nil, 3:nil, 1:2:3:nil)}
+        \when{append.2}
+        \holds{append(2:nil, 3:nil, 2:3:nil)}
+        \when{append.2}
+        \holds{append(nil, 3:nil, 3:nil)}
+        \when{append.1}
+        \holds{$true$}
+\end{derive}
+\end{itemize}
+\end{foil}
+
+\begin{foil} 
+\begin{itemize}
+\item Solving a problem with unknowns by deduction (I)
+\begin{derive}
+        \HOLDS append(1:2:nil, 3:nil, US)...
+        \WHENN {\rm Preparing to use} append.2 $US=1:ZS'$...
+        \HOLDS append(1:2:nil, 3:nil, 1:$ZS'$)...
+        \WHEN  append.2...
+        \HOLDS append(2:nil,   3:nil, $ZS'$)...
+        \WHENN {\rm Preparing to use} append.2 $ZS'=2:ZS''$...
+        \HOLDS append(2:nil,   3:nil, 2:$ZS''$)...
+        \WHEN  append.2...
+        \HOLDS append(nil,     3:nil, $ZS''$)...
+        \WHENN {\rm Preparing to use} append.1 $ZS''= 3:\mathtt{nil}$...
+        \HOLDS append(nil,     3:nil, 3:nil)...
+        \WHEN  append.1...
+        \HOLDS $true$...
+\end{derive}
+
+\item The relevant substitutions are
+\[
+        US      &=&     1:ZS'
+        \\
+        ZS'     &=&     2:ZS''
+        \\
+        ZS''    &=&     3:\mathtt{nil}
+\]
+
+So $$US=1:2:3:\mathtt{nil}$$
+\end{itemize}
+\end{foil}
+%-----------------------------------------------------------------------------------------------
+\begin{foil}\label{appendtrace}
+\begin{itemize}
+\item Solving a problem with unknowns by deduction (II)
+\begin{derive}
+        \HOLDS append(XS, 3:nil, 1:2:3:nil)...
+        \WHENN {\rm preparing to use} append.2 $XS=1:XS'$...
+        \HOLDS append(1:XS', 3:nil, 1:2:3:nil)...
+        \WHEN  append.2...
+        \HOLDS append(XS', 3:nil, 2:3:nil)...
+        \WHENN {\rm preparing to use} append.2 $XS'=2:XS''$...
+        \HOLDS append(2:XS'', 3:nil, 2:3:nil)...
+        \WHEN  append.2...
+        \HOLDS append(XS'', 3:nil, 3:nil)...
+        \WHEN  append.1 $XS''=\mathtt{nil}$...
+        \HOLDS append(nil, 3:nil, 3:nil)...
+        \WHEN  $true$...
+\end{derive}
+
+\item The relevant substitutions are
+\[
+        XS      &=&     1:XS'
+        \\
+        XS'     &=&     2:XS''
+        \\
+        XS''    &=&     \mathtt{nil}
+\]
+
+So $$XS=1:2:\mathtt{nil}$$
+
+\item We used {\tt append} to calculate a prefix! 
+\item Some relations can be defined for use in both directions!
+\end{itemize}
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil}
+\begin{cframed}
+Notation (Logpro)
+\end{cframed} 
+
+Variables:      words beginning with uppercase letters: 
+\begin{smalltt}
+        Foo 
+        Monty_Python
+\end{smalltt}
+
+Primitive Values:      numbers and strings:  
+\begin{smalltt}
+        123
+        -456
+        "wretched oaf!"
+\end{smalltt}
+
+Constants: words beginning with lowercase letters:
+\begin{smalltt}
+        strange 
+        good_Vibrations
+\end{smalltt}
+
+Terms:       constants, constants followed by bracketed term-lists:
+\begin{smalltt}
+        it_is_raining
+        it_is_raining()                  \rmbox{(This is the same term as above)}
+        wet(Here)
+        embattled(primitive(Teacher), spaceCadet(Pupil), Laboratory)
+\end{smalltt}
+
+Terms:       lists of terms 
+\begin{smalltt}
+             X:Y:3:nil
+             X:XS
+\end{smalltt}
+
+Formulae:       as for terms, also negated formulae
+\begin{smalltt}
+        not kidding
+\end{smalltt}
+
+Terms and formulae may use algebraic notation, provided the syntax of the
+operators is declared (see the Logpro Manual).
+\begin{smalltt}
+        X := E+F --> X := E'+F
+\end{smalltt}
+
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil}
+Example of a dialogue with the Logpro system.\\
+{\smaller \user{(User input in this colour)}}
+
+Definition of the \verb.parent. relation as a collection of facts   
+\begin{smalltt}
+        18 % \user{logpro}
+        logpro-0,999 (16:16 Thursday Dec 23 1999)
+        -- \user{parent(sid,    bill)     :- .}
+        -- \user{parent(liz,    bill)     :- .}
+        -- \user{parent(sid,    leah)     :- .}
+        -- \user{parent(liz,    leah)     :- .}
+        -- \user{parent(leah,   winifred) :- .}
+        -- \user{parent(leah,   albert)   :- .}
+        -- \user{parent(bill,   gerald)   :- .}
+        -- \user{parent(bill,   sarah)    :- .}
+\end{smalltt}
+
+We can ask for a statement (a {\it ground formula} -- with no variables) to be verified
+\begin{smalltt}
+        -- \user{parent(liz, leah)?}
+        yes?                            \rmbox{\Return}
+        --
+\end{smalltt}
+
+If the statement cannot be verified, the system  prompts for input directly.
+\begin{smalltt}
+        -- \user{parent(foo, bar)?}
+        --
+\end{smalltt}
+\begin{note}
+The fact that the prompt {\tt --} came in response to the  question indicates
+that that statement could not be verified.
+\end{note}
+
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+We can ask for the substitutions which satisfy an existential problem:
+\begin{smalltt}
+        -- \user{parent(sid, X)?}       
+        
+        X = bill         ?       \Return
+        X = leah         ?       \Return
+\end{smalltt}
+
+If there is more than one solution substitution, they are shown in turn.
+
+After each solution is shown the system prompts with ``{\tt ?}''. We reply
+``\user{\smaller\tt <Return>}'' to continue the search for solutions, and
+``\user{.}'' to stop the search for solutions.
+
+\begin{smalltt}
+        -- \user{parent(X, Y)?}
+        Y = bill     X = sid  ? \Return
+        Y = bill     X = liz  ? \Return
+        Y = leah     X = sid  ? \Return
+        Y = leah     X = liz  ? \Return
+        Y = albert   X = leah ? \user{.}
+\end{smalltt}
+
+We can compose conjunctions of queries
+\begin{smalltt}
+        -- \user{parent(sid, X),}       
+           \user{parent(X,   Y)?}       
+           
+        Y = gerald   X = bill ?  \Return
+        Y = sarah    X = bill ?  \Return
+        Y = winifred X = leah ?  \Return
+        Y = albert   X = leah ?  \Return
+\end{smalltt}
+
+        
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil}
+New relations are defined by (collections of) clauses:
+
+\begin{itemize}
+\item 
+``$X$ has grandparent $Z$ if one of $X$'s parent's, $Y$, has parent $Z$.''
+\begin{smalltt}
+        grandparent(X, Z) :- parent(X, Y), parent(Y, Z).
+                         \rmbox{``if''}            \rmbox{``and''}
+\end{smalltt}
+
+\item ``$X$ has mother $Y$ if $X$'s parent is $Y$ and $Y$ is female.''
+\begin{smalltt}
+        mother(X, Y)    :-    parent(X, Y), female(Y).
+        
+        \rmbox{``the clause head''}       \rmbox{``the clause body''}
+\end{smalltt}
+
+\item ``Sid, Bill, Albert, and Gerald are male.''
+\begin{smalltt}
+        male(sid)    :- .
+        male(bill)   :- .
+        male(albert) :- .
+        male(gerald) :- .
+\end{smalltt}
+
+\item ``$X$ is responsible if $X$ is the culprit, or $X$ manages a responsible person, $Y$.''
+\begin{smalltt}
+        responsible(X) :- culprit(X).
+        responsible(X) :- manages(X, Y), responsible(Y).
+\end{smalltt}
+\end{itemize}
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil}
+(Some) relations may be used in more than one direction
+\begin{note}
+Later we will be able to be more precise about the
+circumstances when this is possible.
+\end{note}
+
+For example, {\tt append}
+\begin{smalltt}
+-- \user{append(nil,  YS, YS) :- .}
+-- \user{append(X:XS, YS, X:ZS) :- append(XS, YS, ZS).}
+
+-- \user{append(X, Y, 1:2:3:4:nil)?}       \rmbox{``Find\(X\) and\(Y\) st. \(X++Y=1:2:...\)''}
+Y = nil X = 1 : 2 : 3 : 4 : nil ?   \rmbox{\Return} 
+Y = 4 : nil X = 1 : 2 : 3 : nil ?   \rmbox{\Return}
+Y = 3 : 4 : nil X = 1 : 2 : nil ?   \rmbox{\Return}
+Y = 2 : 3 : 4 : nil X = 1 : nil ?   \rmbox{\Return}
+Y = 1 : 2 : 3 : 4 : nil X = nil ?   \rmbox{\Return}
+--                                  
+\end{smalltt}
+\begin{smalltt}
+   \user{append(1:2:nil, X, 1:2:3:4:nil)?} \rmbox{``Find \(X\) st. \([1,2]++X=[1,2,3,4]\)''}
+X = 3 : 4 : nil ?                   \rmbox{``Here it is.'' \Return}
+-- \user{append(1:2:nil, X, 1:3:nil)?}     \rmbox{``Find \(X\) st. \([1,2]++X=[1,3]\)''}
+--                                  \rmbox{``None: I'm ready for your next question.''}
+\end{smalltt}
+
+\begin{itemize}
+\item If there are no variables in the query, the solution is shown as ``Yes''.
+\item If there is more than one solution, they are shown in turn.
+\item If there are no solutions, the system just prompts for another query.
+\end{itemize}\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil}
+Some definitions can be surprisingly simple: for example, list membership 
+\begin{smalltt}
+member(X, XS) :- append(As, X:Bs, XS).
+\end{smalltt}
+
+
+\begin{smalltt}
+-- \user{member(jim, jim:jam:nil).}
+Yes? \Return
+
+
+-- \user{member(X, jim:jam:nil)}
+X = jam ? \Return
+X = jim ? \Return
+\end{smalltt}
+
+Note that the system delivers as many answers as there are ways of 
+solving the query.
+\begin{smalltt}
+-- \user{member(jim, jim:jam:jim:nil).}
+Yes? \Return
+Yes? \Return
+\end{smalltt}
+
+Having such redundancy sometimes causes an exponential increase in
+runtime for a logic program. 
+
+If a conjunction of $n$ goals is solved, and each has one redundant solution, then
+the conjunction may generate $2^n$ solutions.
+
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{cframed}
+Logical Meaning of a Definition 
+\end{cframed}
+
+
+\begin{smalltt}
+        grandparent(X, Z) :- parent(X, Y), parent(Y, Z).
+\end{smalltt}
+        $$\forall X, Z \cdot
+          \(grandparent(X, Z) \Leftarrow 
+            \exists Y \cdot \(parent(X, Y)\\\land\\parent(Y,Z)\)\)
+        $$  
+
+\begin{smalltt}
+        elem(X, XS) :- append(As, X:Bs, XS).
+\end{smalltt}
+        $$\forall X, XS \cdot \(elem(X, XS) \Leftarrow 
+          \exists As, Bs \cdot append(As, X:Bs, XS)\)$$
+
+\begin{smalltt}
+        append(nil,  YS, YS).
+        append(X:XS, YS, X:ZS) :- append(XS, YS, ZS).
+\end{smalltt}
+        \[
+        \forall YS \cdot append(nil,  YS, YS)
+        \hidewidth
+        \\\land\\
+        \forall & X, XS, YS, ZS \cdot\\
+                & \(append(X:XS, YS, X:ZS)\Leftarrow append(XS, YS, ZS)\)
+        \]
+
+
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{cframed}[6.7in]
+\begin{itemize}
+        \item The meaning of ``meaning'' is not completely straightforward.
+        \item Logical meaning and operational meaning differ in Prolog.
+\end{itemize}
+\end{cframed}
+
+Example: consider the logically equivalent definitions
+\begin{smalltt}
+        ancestor(X, Y)   :- parent(X, Y).
+        ancestor(X, Y)   :- parent(X, Z), ancestor(Z, Y).
+\end{smalltt}
+and
+\begin{smalltt}
+        ancestor3(X, Z) :- parent(X, Z).
+        ancestor3(X, Z) :- ancestor3(X, Y), parent(Y, Z).
+\end{smalltt}
+
+The former gives a definite answer to all ground queries. 
+
+The latter does not terminate for queries where the former fails.
+\begin{note}
+Here are two traces of failing queries
+\begin{alltt}\small
+ ancestor(faith, hope)?
+ ancestor(faith, hope) :-  parent(faith, hope). \fails
+ ancestor(faith, hope) :-  parent(faith, Z.2), \fails ancestor(Z.2, hope).
+\end{alltt}
+
+
+\begin{alltt}\small
+ ancestor3(faith, hope)?
+ ancestor3(faith, hope) :-  parent(faith, hope). \fails 
+ ancestor3(faith, hope) :-  ancestor3(faith, Y.2), parent(Y.2, hope).
+ 
+    ancestor3(faith, Y.2)  :-  parent(faith, Y.2). \fails
+    ancestor3(faith, Y.2)  :-  ancestor3(faith, Y.12), parent(Y.12, Y.2).
+ 
+       ancestor3(faith, Y.12) :-  parent(faith, Y.12). \fails
+       ancestor3(faith, Y.12) :-  ancestor3(faith, Y.22), parent(Y.22, Y.12).
+ 
+ 
+          ancestor3(faith, Y.22) :-  parent(faith, Y.22). \fails
+          ancestor3(faith, Y.22) :-  ancestor3(faith, Y.32), parent(Y.32, Y.22).
+          \rmbox{{\it etc., etc.}}
+\end{alltt}
+\end{note}
+
+We need to understand the {\it Operational Meaning} of Prolog to explain this.
+\end{foil}
+
+
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{cframed}
+Understanding Operational Meaning\\
+(how Prolog really works)
+\end{cframed}
+
+
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{cframed}
+Substitutions and Unification
+\end{cframed}
+
+{\bf Definition:} A {\em substitution} is an association of
+terms with variables. Here are three examples:
+
+        \[      X=sid & Y=bill & 
+        \\      X=sid & Y=bill & Z=sarah 
+        \\      X=sid & Y=leah & Z=albert 
+        \]
+
+We say (loosely) that the variables are {\it bound} to the terms in the substitution.
+
+To apply a substitution $S$ to a formula (term) $F$ (here written $F|[S|]$), simply replace each variable
+in the term with the term (if any) with which it is associated in 
+the substitution. 
+
+For example
+
+        \[      parent(X, Y) |[X=sid\; Z=gerald|] = parent(sid, Y)
+        \]
+        
+To apply a substitution to a list of formulae, apply it to each of them
+
+For example 
+
+        \[
+                (parent(X, Y),   &parent(Y, Z)) |[X=sid\; Z=gerald|] = \\
+                (parent(sid, Y), &parent(Y, gerald))
+        \]
+
+We also define $S\compose T$: the {\it composition of substitutions} 
+$S$ and $T$ such that for all formulae (terms) $F$
+$$
+        F|[S\compose T|] = (F|[T|])(|[S|])        
+$$
+\end{foil}
+
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+
+{\bf Definition:} Formulae (terms) $F_1$ and $F_2$ {\it unify} if there is
+a substitution $S$ such that 
+
+        $$ F_1|[S|] = F_2|[S|]$$
+
+$S$ is called a $unifier$ of $F_1$ and $F_2$ when this is so.
+Examples:
+
+\begin{itemize}
+\item $parent(fred, Y)$ unifies with $parent(P, jim)$ with unifier 
+($P=fred\;Y=jim$)
+\item $equal(X, X)$ unifies with $equal(succ(Y), succ(zero))$ with unifier 
+($X=succ(zero)\;Y=zero$)
+\end{itemize}
+
+Now consider the formulae
+\[
+        append(X:XS, YS, X:ZS) & \rmbox{and} & append(WS, 3:nil, 1:2:3:nil)
+\]
+which are unified by the substitution, $U$
+\[
+        WS=1:XS\; YS=3:nil\; X=1\; ZS=2:3:nil
+\]
+There are many other unifiers (for example, any extension of $U$ which assigns to $XS$)
+but they are  all more specific than $U$. 
+
+{\bf Definition:} $U$ is the {\it most general unifier} of 
+formulae (terms) $F_1$ and $F_2$, iff for each unifier, $V$ of 
+$F_1, F_2$ there is a substitution $S$ such that $V=|[S\compose U|]$.
+\begin{note}
+If two formulae (terms) unify then they have a most general unifier.
+
+Later in the course we will present an  algorithm which finds the
+most general unifier of two formulae (terms) if there is one.
+\end{note}
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+Not all pairs of terms have unifiers.
+\begin{enumerate}
+\item $3$ and $5$ -- distinct primitives.
+\item $asia$ and $africa$ -- distinct constants.
+\item $foo(3)$ and $baz(3)$ -- distinct constructors. 
+\item $foo(3)$ and $foo(5)$ -- distinct subterms.
+\item $foo(X,X)$ and $foo(5,6)$ -- contradictory substitutions for $X$.
+\item $XS$ and $X:XS$ -- infinite terms are not allowed.
+\end{enumerate}
+\begin{note}
+If infinite terms were allowed, then the MGU of
+$XS$ and $X:XS$ would be the following substitution, which maps $XS$ to
+an infinite term $XS=X:X:X:X.....$.
+\end{note}
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{cframed}
+Finding Solutions\\{\smaller first approximation}
+\end{cframed}
+\begin{note}
+We use ``solution of a formula'' to mean: 
+``a substitution which makes the formula true.''
+elsewhere.
+
+We also use ``solve'' to mean ``find the solutions''
+\end{note}
+
+Problems (goals) take the form \(G\sb1, ... G\sb{k}\)
+
+\begin{smalltt}\rm
+\textbf{procedure} \(solve((G\sb1, ... G\sb{k}))\)
+   \textbf{if} \(k\neq 0\)
+      \textbf{if} the head of any clause unifies with \(G\sb1\) \textbf{then}
+          Make a fresh copy of all such clauses (see below)
+          \textbf{for each} such copy \(A\){ :-} \(B\sb1, ... B\sb{j}\)
+              Let \(\sigma\) be the most general unifier of \(A\) and \(G\sb1\)
+                 \(solve((\underbrace{B\sb1|[\sigma|], ... B\sb{j}|[\sigma|]}\sb{\mathrm{NB:} j \mathrm{may be} 0}, G\sb2|[\sigma|], ... G\sb{k}|[\sigma|]))\) 
+          \textbf{end for}
+      \textbf{else}
+          No clause applies, so this activation of \(solve\) has failed.
+      \textbf{end if}
+   \textbf{else}
+      The search has succeeded
+   \textbf{end if}
+   Return to the calling \(solve\), thereby exploring the next applicable clause. 
+\textbf{end} \(solve\)
+\end{smalltt}
+\begin{note}
+The step in which $G_1$ is replaced by $B_1, ...$ is called a {\it resolution} 
+step, and $G_1$ is called the {\it resolvent}. 
+The choice of $G_1$ as resolvent at each stage is specific to the 
+design of Prolog. 
+\end{note}
+
+\begin{itemize}
+\item A fresh copy of a definition is one whose variables have been systematically renamed to
+variables unused so far.
+\item Fresh copies are made to keep the variables in a definition which is going to
+be used distinct from those in the goal it will be used on.
+\end{itemize}
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{cframed}
+Finding Solutions\\{\smaller second approximation}
+\end{cframed}
+
+The answer substitution $\user{\alpha}$ is accumulated as the search proceeds
+
+\begin{smalltt}\rm
+\textbf{procedure} \(solve((G\sb1, ... G\sb{k}), \user{\(\alpha\)})\) 
+   \textbf{if} \(k\neq 0\)
+      \textbf{if} the head of any clause unifies with \(G\sb1\) \textbf{then}
+          Make a fresh copy of all such clauses 
+          \textbf{for each} such copy \(A\){ :-} \(B\sb1, ... B\sb{j}\) in order of definition
+              Let \(\sigma\) be the most general unifier of \(A\) and \(G\sb1\)
+                 \(solve((B\sb1|[\sigma|], ... B\sb{j}|[\sigma|], G\sb2|[\sigma|], ... G\sb{k}|[\sigma|]), \user{\(\sigma\compose\alpha\)})\) 
+          \textbf{end for}
+      \textbf{else}
+          No clause applies, so this activation of \(solve\) has failed.
+      \textbf{end if}
+   \textbf{else}
+      An answer has been found: it is the substitution \(\user{\(\alpha\)}\)
+   \textbf{end if}
+   Return to the calling \(solve\), thereby exploring the next applicable clause. 
+\textbf{end} \(solve\)
+\end{smalltt}
+
+
+\begin{itemize}
+\item ``In order of definition'' means ``in the order in which the 
+clause appeared when the definitions were made.''
+\item Prolog searches {\it depth-first} -- witness 
+the placing of the additional subgoals for the recursive \(solve\).
+\end{itemize}
+\begin{note}
+It is worth considering just how intuitively graspable Prolog would be
+if the search were organised breadth-first, or using some 
+other universal principle.
+
+There is a sort of logic programming, employed largely in tactical theorem-proving
+systems, in which the specifics of the proof-search strategy can be decided (as it were)
+inference step by inference step. Isabelle and Jape are examples of such
+proof systems.
+\end{note}
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+Example
+\begin{smalltt}
+    solve(parent(sid,X), male(X)), ())
+    |
+    |\sig{X=bill}
+    +-solve((male(bill)), (X=bill)
+    | |
+    | |\sig{()}
+    | +-solve((), (X=bill))
+    |   \succeeds
+    |
+    |\sig{X=leah}
+    +-solve(male(leah)), (X=leah))
+      \fails
+\end{smalltt}
+
+Key
+\begin{itemize}
+\item Alternatives at a given level of $solve$ are grouped vertically
+\item Nested invocations of $solve$ are indented horizontally
+\end{itemize}
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+Example
+\begin{smalltt}
+    solve((grandparent(sid, G)), ())
+    |
+    |\sig{G=Z'}
+    +-solve((parent(sid, Y'), parent(Y', Z')), (G=Z'))
+      |
+      |\sig{Y'=bill}
+      +-solve((parent(bill, Z')), (G=Z' Y'=bill))
+      | |
+      | |\sig{Z'=gerald}
+      | +-solve((), (Z'=gerald G=gerald Y'=bill))
+      | | \succeeds
+      | |
+      | |\sig{Z'=sarah}
+      | +-solve((), (Z'=sarah G=sarah Y'=bill))
+      |   \succeeds
+      |
+      |\sig{Y'=leah}
+      +-solve((parent(leah, Z')), (G=Z' Y'=leah))
+        |
+        |\sig{Z'=winifred}
+        +-solve((), (Z'=winifred G=winifred Y'=leah))
+        | \succeeds
+        |
+        |\sig{Z'=albert}
+        +-solve((), (Z'=albert G=albert Y'=leah))
+          \succeeds
+\end{smalltt}
+\end{foil}
+
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{cframed}
+Equality
+\end{cframed}
+
+There is no built-in equality relation, but we can define one as follows.
+\begin{smalltt}
+        #infix3 =
+        X=X :- .
+\end{smalltt}
+
+This succeeds if its two actual parameters can be unified.
+\begin{smalltt}
+        -- \user{3=3?}
+        yes ?
+        -- \user{all:my:cats=all:my:cats?}
+        yes ?
+\begin{smalltt}
+
+It may, of course, bind variables
+\end{smalltt}
+        -- \user{X:XS=all:my:cats?}
+        XS = my : cats X = all ? 
+\end{smalltt}
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{cframed}
+Data Representation: everything is a term
+\end{cframed}
+
+Prolog data are represented as {\it terms}. 
+
+There is no {\tt data} declaration for composite term constructors in Prolog.
+
+The following are all Prolog terms.
+\begin{smalltt}
+        plus(3, 5)
+        minus(plus(3, 5), multiply(a, 4))
+        object(density(1)&mass(kg(56))&accel(cmss(200)))
+        rectangle(position(X;Y)&dimension(H;W))
+        3+5
+        (3+5)-(a*4)
+\end{smalltt}
+\begin{note}
+The uniformity of program and data representation is one of the very
+appealing features of Prolog. It supports a style of programming
+in which programs can easily be constructed and analysed by programs,
+as well as being executed by them. One needs to add metaprogramming
+primitives to the language if this is to be done properly. Although 
+we won't be using them here, Logpro and  other Prolog implementations
+have primitives such as
+\begin{alltt}
+ call(Term)           \rmbox{attempts to solve the given term}
+ functor(T, Op, Args)\rmbox{\(T\) composed with connective \(Op\) and arguments \(Args\)}
+\end{alltt}
+
+\end{note}
+
+Example:
+We define the relation $is$ to implement basic arithmetic notation
+for use within our programs.
+\begin{smalltt}
+        #infix1 is
+        #infix4 +
+        #infix5 *
+        V is V   :- num(V).
+        V is E+F :- Ev is E, Fv is F, sum(Ev, Fv, V). 
+        V is E*F :- Ev is E, Fv is F, prod(Ev, Fv, V). 
+\end{smalltt}
+Observe
+\begin{itemize}
+\item Use of built-in relations {\tt sum} and {\tt prod}.
+\item Use of built-in predicate {\tt num} to test for a Logpro number.
+\end{itemize}
+
+\begin{smalltt}
+        -- \user{X is 3+4*5+6?}
+        X = 29 ? 
+\end{smalltt}
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{cframed}
+Technique: Answer Parameters
+\end{cframed}
+
+The most obvious definition of list reversal is (as in FP)
+\begin{smalltt}
+        rev(nil, nil) :- .
+        rev(X:XS, YS) :- rev(XS, RS), append(RS, X:nil, YS).
+\end{smalltt}
+
+This leads (as expected) to quadratic behaviour:
+\begin{smalltt}
+        -- \user{rev(1:2:3:4:nil R)?}
+        after 15 inferences 
+        R = 4 : 3 : 2 : 1 : nil ?
+        -- \user{rev(1:2:3:4:5:nil, R)?}
+        after 21 inferences 
+        R = 5 : 4 : 3 : 2 : 1 : nil ?
+\end{smalltt}
+
+The FP solution would be to use an ``accumulating parameter''
+\begin{smalltt}
+        rev2(nil, nil) :- .                     /* WRONG */
+        rev2(X:XS, YS) :- rev2(XS, X:YS).       /* WRONG */
+\end{smalltt}
+
+A couple of traces show why this doesn't quite work
+\begin{smalltt}
+        rev2(1:2:nil, nil) 
+        rev2(2:nil, 1:nil) 
+        rev2(nil, 2:1:nil) 
+        \fails
+        
+        rev2(1:2:nil, R) 
+        rev2(2:nil, 1:R) 
+        rev2(nil, 2:1:R) 
+        \fails
+\end{smalltt}
+\end{foil}
+
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+Adding an answer parameter
+
+The predicate {\tt rev3(XS, YS, ANSWER)} holds if {\tt ANSWER} is the
+result of appending the reverse of {\tt XS} to {\tt YS}.
+
+\begin{smalltt}
+        rev3(nil,  YS, YS)      :- .                     
+        rev3(X:XS, YS, ANSWER)  :- rev3(XS, X:YS, ANSWER).       
+\end{smalltt}
+
+Which is linear
+\begin{smalltt}
+        -- \user{rev3(1:2:3:4:nil, nil, R)?}
+        after 5 inferences 
+        R = 4 : 3 : 2 : 1 : nil ?
+        -- \user{rev3(1:2:3:4:5:nil, nil, R)?}
+        after 6 inferences 
+        R = 5 : 4 : 3 : 2 : 1 : nil ? 
+\end{smalltt}
+
+So the sensible definition for {\tt rev} is
+\begin{smalltt}
+        rev(XS, YS) :- rev3(XS, nil, YS).
+\end{smalltt}
+
+A trace shows the operational behaviour
+\begin{smalltt}
+        rev3(1 : 2 : 3 : nil, nil, R)
+        rev3(2 : 3 : nil, 1 : nil, R)
+        rev3(3 : nil, 2 : 1 : nil, R)
+        rev3(nil, 3 : 2 : 1 : nil, R)
+        \succeeds
+        R = 3 : 2 : 1 : nil
+\end{smalltt}
+
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil}
+\begin{cframed}
+Technique: Open Lists
+\end{cframed}
+\begin{note}
+Open lists are akin to {\it Difference Lists} of which there are many
+accounts in the literature (not all of them terribly easy to understand). 
+
+A difference list ($L|S$) represents the list $L$ with suffix $S$ 
+stripped from it.
+
+In other words $x_1:x_2:...:x_m:y_1:...y_n:nil | y_1:...y_n:nil$ represents
+$x_1:x_2:...:x_m$. 
+
+Thus an object of the form $L|S$ where $S$ is not a suffix of $L$
+cannot be interpreted as a difference list.
+
+On the other hand, an object of the form
+$x_1:x_2:...:x_m:End|End$ can be interpreted as a difference list -- it's simply that we don't know
+what the suffix is yet.
+
+Finally, the rule for appending open lists also works for difference lists.
+
+It is tempting to define the difference-list to list relation as
+\begin{alltt}
+        dl2l(L|S, R) :- append(R, S, L).
+\end{alltt}
+
+but if $L|S$ is an open difference list, {\it i.e.} if $S$ is an unbound variable,
+then this does not terminate. If we are content to destroy the openness
+of an open difference list, then we can modify the definition as follows:
+\begin{alltt}
+        dl2l(L|nil, L) :- !.
+        dl2l(L|S, R)   :- append(R, S, L).
+\end{alltt}
+
+The first clause will match either an open difference list (the unification with
+$nil$ will close it), or one with suffix component $nil$. 
+In either case, the corresponding list is just $L$. Since in
+these circumstances there are (of course) no others, we place the cut
+in order to prevent the second clause being explored.
+
+The definition is still flawed: in order for the $append$ in
+the second clause to terminate, the suffix $S$ must itself be
+``closed'' -- we leave the details of the changes 
+required as an exercise.
+
+\begin{comment}
+        #infix1 |
+        closed(nil)  :- !.
+        closed(X:XS) :- closed(XS).
+        dl2l(L|S, R) :- closed(S), append(R, S, L).
+\end{comment}
+
+\end{note}
+
+Variables can be used as placeholders at the end of a list.
+
+For example: $1:2:3:4:End$ represents a list starting $1:2:3:4$ and ``open'' at the end.
+
+Appending the list $5:6:nil$ to it may be done by binding $End$ to $5:6:nil$
+
+Represent an {\it open list} as a pair $L|Lend$ with $Lend$ as the suffix of $L$
+
+Unification of the $End$ variable is a bit like assignment.
+
+Appending such lists is a constant-time operation
+\begin{smalltt}
+        #infix1 |
+        appol(L|Lend, Lend|Mend, L|Mend) :- .
+\end{smalltt}
+\begin{note}
+The {\tt appol} predicate is, perhaps, rather too concisely formulated for
+easy understanding. A logically identical formulation (which is  less
+efficient only by a constant factor) is
+\begin{alltt}
+        appol(L|Lend, M|Mend, R|Rend) :- R=L, Lend=M, Rend=Mend.
+\end{alltt}
+
+Where {\tt =} has the usual meaning (namely {\tt X=X.}).
+
+\end{note}
+
+\begin{smalltt}
+        -- \user{appol(1:2:3:X|X, 4:5:Y|Y, R)?}
+        After 2 inferences 
+        R = 1 : 2 : 3 : 4 : 5 : Mend.1 | Mend.1 
+        Y = Mend.1 
+        X = 4 : 5 : Mend.1 ? 
+\end{smalltt}
+
+``Closing'' an open list is easy: bind $nil$ to the end marker.
+\begin{smalltt}
+        ol2l(L|nil, L) :- .
+\end{smalltt}
+
+Applications: anything where ``$++$-elimination'' would be used in FP.
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{cframed}
+Negation as Failure
+\end{cframed}
+
+The predicate {\tt not P} is solved by attempting to solve {\tt P}
+\begin{itemize}
+\item If a solution to {\tt P} is found, then {\tt not P} fails.
+\item If no solution to {\tt P} is found, then {\tt not P} succeeds.
+\end{itemize}
+
+\begin{note}
+This method is based on the {\it closed world assumption}, namely that
+the facts needed in the execution of a program are exactly those 
+which are provable in the program.
+\end{note}
+
+Examples:
+\begin{smalltt}
+        X /= Y :- not X=Y.
+        nonmember(X, XS) :- not member(X, XS).
+\end{smalltt}
+
+A membership predicate that succeeds no more than once.
+\begin{smalltt}
+        element(X, nil)  :- fail.
+        element(X, Y:YS) :- X=Y.
+        element(X, Y:YS) :- X/=Y, element(X, YS).
+\end{smalltt}
+\begin{note}
+Note that the first clause of the definition of $element$ 
+could have been omitted without changing the meaning 
+of that relation.
+\end{note}
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil}
+The method only works for {\em ground formulae}.
+\begin{itemize}
+\item Success of {\tt P(X)} just means that {\tt P($Term$)} holds for {\it some} $Term$.
+\item So invalid to conclude that {\it all} instances of {\tt not P(X)} are false.
+\end{itemize}
+
+Example: given 
+\begin{smalltt}
+        unwed_student(X) :- not wed(X), student(X).
+        wed(jim)     :- .
+        student(pip) :- .
+\end{smalltt}
+
+The query {\tt unwed\_student(X)} would fail, even though {\tt pip} is an
+unwed student.
+
+The solution is to define
+\begin{smalltt}
+        unwed_student(X) :- student(X), not wed(X).
+\end{smalltt}
+thereby ensuring that $X$ is bound before $not~wed(X)$ is solved.
+
+Some implementations, including Logpro, check that the negated formula 
+is a ground formula before starting to solve it.
+
+Others leave it as the programmer's responsibility to check
+
+Example: the following succeeds because $X$ is bound to $5$ before the {\tt member} 
+predicate is solved
+\begin{smalltt}
+        X=5, not member(X, 1:2:3:4:nil)?
+\end{smalltt}
+\end{foil}
+
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{cframed}[4.7in]
+Case Study: Route Finding\\\smaller (contrived example exploring operational meaning)
+\end{cframed} 
+
+Partial map of Oxford
+\begin{smalltt}
+        walk(n, stgiles, balliol,   oucs)   :- .
+        walk(e, keble,   oucs,      oucl)   :- .
+        walk(n, parks,   oucl,      eng)    :- .
+        walk(s, banbury, eng,       oucs)   :- .
+        walk(s, parks,   oucl,      museum) :- .
+\begin{smalltt}
+
+Abstraction of the map
+\end{smalltt}        
+        go(A, B) :- walk(Dir, Rd, A, B).
+\end{smalltt}
+
+Accessiblity relation
+\begin{smalltt}
+        access(From, From) :- .
+        access(From, To)   :- go(From, Place), access(Place, To).
+\end{smalltt}
+
+Where can we get to from {\tt balliol}?
+\begin{smalltt}
+-- \user{access(balliol, Where)?}
+Where = balliol ? 
+Where = oucs ? 
+Where = oucl ? 
+Where = eng ? 
+Where = oucs ? 
+Where = oucl ? 
+Where = eng ? 
+Where = oucs ? \user{.}
+\end{smalltt}
+
+The solutions are evidently repeating! What happened to the museum?
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+
+This can be remedied
+\begin{smalltt}
+-- \user{access(balliol, Where)?}
+Where = balliol ? 
+Where = oucs ? 
+Where = oucl ? 
+Where = museum ? 
+Where = eng ? 
+Where = oucs ? 
+Where = oucl ? \user{.}
+\end{smalltt}
+
+\begin{itemize}
+\item Superficial Remedy: change fact order (move the last {\tt walk} higher) 
+\item Objection: a highly unstable ``method'' which doesn't scale.
+\end{itemize}
+
+Diagnosis:
+\begin{itemize}
+\item Depth-first search gets us trapped in the Keble Rd. Triangle.
+\item Remedy only worked accidentally because it suited the DFS order.
+\item A bidirectional {\tt go} would make it impossible to avoid such traps.
+\begin{smalltt}
+        go(A, B) :- walk(Dir, Rd, A, B).
+        go(A, B) :- walk(Dir, Rd, B, A).
+\end{smalltt}
+\end{itemize}
+
+\begin{cframed}[6.5in]
+Depth-First Search is {\it Incomplete}
+\\
+There may be solutions to a given problem which it can never find
+\end{cframed}
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil}
+\begin{cframed}
+Order of predicates {\it within} clauses is operationally important.
+\end{cframed}
+
+The following variant of {\tt access} generates all solutions 
+\begin{smalltt}
+        access'(From, From) :- .
+        access'(From, To)   :- access'(Place, To), go(From, Place).
+\end{smalltt} 
+... but its performance is exponential in path length.
+\end{foil}
+
+
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil}
+Improving the route finder
+
+
+Keep record ($Via$) of places passed so far 
+\begin{smalltt}
+        route(From, From, Via, Route) :- rev(Via, Route).
+        route(From, To,   Via, Route) :-
+                go(From, Next), 
+                not member(Next, Via),
+                route(Next, To, Next:Via, Route).
+\end{smalltt}
+
+The ``front end'' to this is $route/3$
+\begin{smalltt}
+        route(From, To, Route) :- route(From, To, From:nil, Route).
+\end{smalltt}
+\begin{note}
+The three parameter route relation ($route/3$ in Prolog jargon), is
+just a ``front end'' for the workhorse $route/4$. It can occasionally
+be helpful to overload names in this way rather than having to invent slightly distinct
+names for workhorse relations.
+\end{note}
+
+This yields all solutions and then stops.
+
+Exchanging the order of the last two formulae of the second clause of $route/4$
+yields all solutions, and then diverges.
+\end{foil}
+
+
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{cframed}
+Cuts
+\end{cframed}
+
+Consider the relation defined by
+\begin{smalltt}
+nodups(XS,   RS)  :- nd(XS, nil, RS).
+nd(nil,  YS, RS)  :- rev(YS, RS).
+nd(X:XS, YS, RS)  :- member(X, YS),     nd(XS, YS, RS).
+nd(X:XS, YS, RS)  :- not member(X, YS), nd(XS, X:YS, RS).
+\end{smalltt}
+(output list is the same as input list without duplicate elements)
+
+Clauses 2 and  3 of {\tt nd} are mutually exclusive.
+
+Multiple {\tt member} tests are inefficient.
+
+Prolog provides a (controversial) remedy for this kind of inefficiency.
+
+We can rewrite {\tt nd} using the  {\it Cut} (written {\tt !}) thus
+\begin{smalltt}
+nodups(XS,   RS)  :- nd(XS, nil, RS).
+nd(nil,  YS, RS)  :- rev(YS, RS).
+nd(X:XS, YS, RS)  :- member(X, YS), !, nd(XS, YS, RS).
+nd(X:XS, YS, RS)  :- nd(XS, X:YS, RS).
+\end{smalltt}
+
+Semantics: {\it Cut} succeeds and commits to all choices made since the
+parent goal was unified with the head of the clause in which {\it Cut} appears.
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+
+A cut
+\begin{itemize}
+\item prunes all clauses {\it below} it. A goal unified with a clause of a relation that 
+executes a cut does not produce solutions using clauses that occur below 
+that clause in the relation. ({\it c.f.} {\tt nd} clause 2 above)
+
+\item prunes all alternative solutions to the
+goals which appear to its left in its clause. Thus (for example)
+a conjunctive goal followed by a cut will produce at most
+one solution.
+
+\item {\it does not} affect the goals to its right in its clause. They can produce more than
+one solution if they backtrack. 
+\end{itemize}
+\begin{note}
+An appropriately-placed cut can improve the efficiency of a program by ensuring that
+search paths which cannot lead to a solution do not get explored. Such cuts
+also save space in Prolog interpreters by making it unneccessary to store
+information needed for backtracking. The space saving can be
+considerable for certain kinds of program.
+\end{note}
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+Examples: given
+\begin{smalltt}
+        choose(1) :-.
+        choose(2) :-.
+        choose(3) :-. 
+        
+        below(X)     :- choose(X).
+        below(4)     :- .
+        cbelow(X)    :- !, choose(X).
+        cbelow(4)    :- .
+        det(X)       :- choose(X), !.
+        conj(X, Y)   :- choose(X), choose(Y).
+        dconj(X, Y)  :- choose(X), !, choose(Y).
+        ddconj(X, Y) :- choose(X), choose(Y), !.
+        
+\end{smalltt}
+
+we can expect the following behavious
+\begin{smalltt}
+        below(X)     \rmbox{yields} X = 1 and X = 2 and X = 3 and X = 4
+        below(4)     \rmbox{succeeds}
+        cbelow(X)    \rmbox{yields} X = 1 and X = 2 and X = 3
+        cbelow(4)    \rmbox{fails}
+        det(X)       \rmbox{yields} X = 1
+        conj(X, Y)   \rmbox{yields all 9 pairs}
+        dconj(X, Y)  \rmbox{yields} X=1 Y=1 and X=1 Y=2 and X=1 Y=3
+        ddconj(X, Y) \rmbox{yields} X=1 Y=1 
+\end{smalltt}
+
+\end{foil}
+
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{cframed}
+Green Cuts
+\end{cframed}
+
+Example: Minimum is essentially deterministic
+\begin{smalltt}
+        minimum(X, Y, X) :- X<=Y, !.
+        minimum(X, Y, Y) :- X>Y,  !.
+\end{smalltt}
+Once $X\leq Y$ or $X>Y$ has succeeded there is no possibility of the other test
+succeeding. 
+
+Example: Merge is essentially deterministic
+\begin{smalltt}
+        merge(X:XS, Y:YS, X:ZS)   :- X<Y, !, merge(XS,   Y:YS, ZS).
+        merge(X:XS, Y:YS, Y:ZS)   :- X>Y, !, merge(X:XS, YS,   ZS).
+        merge(X:XS, Y:YS, X:Y:ZS) :- X=Y, !, merge(XS,   YS,   ZS).
+        merge(XS,   nil, XS)      :- !.
+        merge(nil,  YS,   YS)     :- !.
+\end{smalltt}
+
+A {\it green cut} is a cut whose placement doesn't alter the 
+declarative meaning of a program (in the sense that exactly the same
+solutions are still found).
+\end{foil}
+
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{cframed}
+ Cuts and Negation
+\end{cframed}
+
+Cut is related to negation in the sense that {\tt not} might be defined
+\begin{smalltt}
+        not X :- X, !, fail.
+        not X :- .
+\end{smalltt}
+(in a Prolog system in which parameters can be executed)
+
+If not were not already defined in Logpro we would write something like
+\begin{smalltt}
+        not X :- call(X), !, fail.
+        not X :- .
+\end{smalltt}
+\begin{note}
+Logpro's inbuilt relation {\tt call} succeeds exactly when the formula which is
+its argument succeeds. 
+\end{note}
+
+We could also use {\tt cut} to define (in Logpro)
+\begin{smalltt}
+        if(Guard, Succ, NonSucc) :- call(Guard), !, call(Succ).
+        if(Guard, Succ, NonSucc) :- call(NonSucc).
+\end{smalltt}
+\end{foil}
+
+\begin{foil} 
+\begin{cframed}
+Red Cuts
+\end{cframed}
+
+In the case of {\tt nd} and {\tt if}, the rule order is {\it essential} for
+the program to behave as intended. Permuting the rule
+order doesn't just change the {\it order} in which
+solutions appear, it may change the meaning of the program
+(in the sense that some solutions may no longer be found, the program may not
+terminate, or some wrong solutions may be found).
+
+Such cuts are called  {\tt red cuts} and have to be used with great care. 
+
+For example, the following innocuous-looking relation is wrong
+\begin{smalltt}
+        minimum(X, Y, X) :- X<=Y, !.
+        minimum(X, Y, Y) :- .
+\end{smalltt}
+\begin{note}
+The given program succeeds on (2, 5, 5) (for example) and is 
+therefore incorrect.
+
+The ``correctness'' argument might have been: ``if $X\leq Y$ then the minimum is $X$
+otherwise it's $Y$ and there's no point in doing another comparison.
+\end{note}
+
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{cframed}
+Case Study: a rule-based term-rewriting system
+\end{cframed}
+
+Problem: We want to be able to apply a variety of algebraic
+rewriting or simplification rules to (Prolog) terms.
+
+For example, given the rewrite rules
+\begin{smalltt}
+        (A+B)+C --> A+(B+C)).
+        0+X     --> X.
+        X+0     --> X.
+\end{smalltt}
+
+we would transform the term $(C+(0+B))+(0+0)$ into $C+B$.
+
+
+Constraints: we want to be able to deal with new kinds of terms and 
+to add new rules easily, {\it i.e.\/} without changing the logic of the program.  
+
+The program we present here uses many features of Prolog fairly creatively, 
+but it is far from efficient.
+
+An important built-in predicate of \Prolog/\LogPro it uses is
+\begin{smalltt}
+        functor(Term, Operator, SubTerms)
+\end{smalltt}
+
+Examples:
+\begin{smalltt}
+     functor((a+b)+c, Op, St)     \rmbox{has answer} Op=(+), St=(a+b):c:nil
+     functor(Term,    int, X:nil) \rmbox{has answer} Term=int(X)
+\rmbox{and}
+     functor(nice(one, cyril), nice, one:cyril:nil) \rmbox{succeeds}
+\end{smalltt}
+\begin{note}
+To be precise, $functor(Term, Op, Subtrees)$ holds when $Term$ has 
+principal connective $Op$, and subterms as in the term-list $SubTerms$. 
+
+Notice that $functor$ can be used both for exploding a term into its constituents, or
+for ``imploding'' a term from its constituents.
+\end{note}
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+1. Infrastructure: 
+
+Selecting a numbered element of a list.
+\begin{smalltt}
+    nth(0,       X:XS, X) :- .
+    nth(succ(N), X:XS, Y) :- nth(N, XS, Y).
+\end{smalltt}
+\begin{note}
+For slightly embarrassing technical reasons connected with the \LogPro implementation
+we will have to use Peano numbers to count. 
+Since we will rarely see a number this will not matter.  
+\end{note}
+
+Note that {\tt nth} can also be used to search a list
+\begin{smalltt}
+    -- nth(R, a:b:c:(d+e):f, (d+e))?
+    R = succ(succ(succ(0))) ?
+\end{smalltt}
+
+Updating a numbered element of a list
+\begin{smalltt}
+    replnth(0,       X:XS, X', X':XS) :- .
+    replnth(succ(N), X:XS, X', X:XS') :- replnth(N, XS, X', XS').
+\end{smalltt}
+
+Example        
+\begin{smalltt}
+    -- replnth(succ(succ(succ(0))), a:b:c:d:f, d+e, R)?
+    R = a:b:c:(d+e):f ? 
+\end{smalltt}
+
+\end{foil}
+
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+2. Following paths within terms
+
+A path is a list of numbers.
+
+To select the subterm designated by a path within a term
+\begin{smalltt}
+    select(nil,  T, T)  :- .    -- \rmbox{end of the path}
+    select(N:NS, T, T') :-  
+          struct(T),            -- \rmbox{it must be a structure}
+          functor(T, OP, Sts),  -- \rmbox{explode it}
+          nth(N, Sts, St),      -- \rmbox{get the \(N\)th subterm}
+          select(NS, St, T').   -- \rmbox{and recursively select}
+\end{smalltt}
+
+This only works if the topmost term is a structure.
+\begin{smalltt}
+    struct(T) :- not atom(T), not num(T), not str(T).
+\end{smalltt}
+
+Examples
+\begin{smalltt}
+    -- select(succ(0):succ(0):nil, x+(y+z), R)?
+    R = z ? 
+\end{smalltt}
+
+Remarkably, {\tt select} may be used to search
+\begin{note}
+It's because we want to use $select$ to search that we  chose the recursive/constructive 
+representation of numbers that we did. It turns out that any countable set with a
+successor relation will suffice. In fact the set can be finite, provided it has as many
+elements as there are expected to be subterms of the ``widest'' of composite terms. 
+In practice 10 or so will suffice, and we could have used the roman numerals i-x, or the digits 0-9,
+with the usual successor relation.
+\end{note}
+\begin{smalltt}
+    -- select(R, a+b+c+d, c)?
+    R = succ(0) : succ(0) : 0 : nil ? 
+\end{smalltt}
+
+... even for patterns!
+\begin{smalltt}
+    -- select(R, a+b+c+d, X+Y)?
+    Y = b + c + d X = a R = nil ? 
+    Y = c + d X = b R = succ(0) : nil ? 
+    Y = d X = c R = succ(0) : succ(0) : nil ? 
+\end{smalltt}
+
+\end{foil}
+
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+
+3. Changing subterms designated by a path within a term
+\begin{smalltt}
+    assign(U, nil,  T, U)  :- .         -- \rmbox{end of the path}
+    assign(U, N:NS, T, T') :- 
+          struct(T),                    -- \rmbox{must be a structure}
+          functor(T, OP, Sts),          -- \rmbox{explode it}
+          nth(N, Sts, St),              -- \rmbox{get the \(N\)th subterm}
+          assign(U, NS, St, St'),       -- \rmbox{recursively assign within it}
+          replnth(N, Sts, St', Sts'),   -- \rmbox{construct new list of subterms}
+          functor(T', OP, Sts').        -- \rmbox{rebuild the term}
+\end{smalltt}
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+4. The ``rewriting engine''
+
+Rewrites $Tree$ as $Tree'$ if there is a rule $Pat-->Repl$ whose pattern occurs within $Tree$
+\begin{smalltt}
+    #infix0 -->
+
+    rewrite(Tree, Tree') :-
+      Pat --> Repl,                    -- \rmbox{choose a rewrite rule} 
+      select(Path, Tree, Pat),         -- \rmbox{find where the pattern occurs}
+      !,                               -- \rmbox{commit to rule and path}
+      assign(Repl, Path, Tree, Tree'). -- \rmbox{update the tree}
+\end{smalltt}
+
+5. Rules have logical variables embedded in them, for example
+\begin{smalltt}
+    (A+B)+C --> A+(B+C).
+    0+X     --> X.
+    0*X     --> 0.
+    1*X     --> X.
+    X+0     --> X.
+    X*0     --> 0.
+    X*1     --> X.
+\end{smalltt}
+
+Term matching/replacement implemented ``for free'' by Prolog matching/variables
+\begin{itemize}
+\item each call of {\tt -->} makes a fresh copy of the pattern and replacement
+\item {\tt select} matches the pattern, binding the logical variables
+\item occurences of the logical variables in the replacement share these bindings
+\end{itemize}
+
+\end{foil}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\begin{cframed}
+        Remark: $select/3$ is redundant
+\end{cframed}
+
+\begin{smalltt}
+   select(Path, Tree, Tree') :- assign(Path, Tree', Tree, Tree).
+\end{smalltt}
+
+\end{foil}
+
+
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+
+6. Rewrite repeatedly until rewriting no longer possible
+\begin{smalltt}
+    rew(Tree, Tree'') :- 
+       rewrite(Tree,   Tree'),
+       show(Tree, "-->"),        -- \rmbox{show user what's happening}
+       !,                        -- \rmbox{commit to this rewrite}
+       rew(Tree', Tree'').       -- \rmbox{continue rewriting}
+                          
+    rew(Tree, Tree)   :- 
+       not rewriteable(Tree), 
+       show(Tree, ".").          -- \rmbox{show user that we finished}
+
+    rewriteable(Tree) :- rewrite(Tree, Tree').
+\end{smalltt}
+
+6. Examples
+\begin{smalltt}
+    -- t2(T), rew(T, T')?
+    ((0 + b) + c) + d * 1 * ((f + g) + h) -->
+    (0 + b) + c + d * 1 * ((f + g) + h) -->
+    0 + b + c + d * 1 * ((f + g) + h) -->
+    0 + b + c + d * 1 * (f + g + h) -->
+    b + c + d * 1 * (f + g + h) -->
+    b + c + d * (f + g + h) .
+    
+    T' = b + c + d * (f + g + h) 
+    T  = ((0 + b) + c) + d * 1 * ((f + g) + h) ? 
+
+    -- t1(T), rew(T, T')?
+    ((a + b) + 0) + d -->
+    (a + b) + 0 + d -->
+    a + b + 0 + d -->
+    a + b + d .
+    
+    T' = a + b + d 
+    T = ((a + b) + 0) + d ? 
+\end{smalltt}
+\end{foil}
+
+
+
+%-----------------------------------------------------------------------------------------------
+\begin{exercises}
+\begin{cframed}
+Tutorial Exercises
+\end{cframed}
+
+A binary tree takes one of the forms
+\begin{center}\begin{tabular}{ll}\tt
+        leaf(\(E\))             &\rmbox{where \(E\) is a term}
+        \\
+        \(T\sb1\) ** \(T\sb2\)   &\rmbox{where \(T\sb1\), \(T\sb2\) are binary trees}
+\end{tabular}
+
+A numeric (binary) tree has number constants at the leaves.
+\end{center}
+
+\begin{ex}
+
+
+Define a predicate {\tt mintip/2}, such that
+\begin{alltt}
+        mintip(T, N) \rmbox{holds if {\tt N} is the smallest leaf in the numeric tree {\tt T}}
+\end{alltt}
+
+Simulate, by means similar to those we demonstrated on slide \pageref{appendtrace}, the
+computation which solves 
+\begin{alltt}
+        mintip((leaf(3)*leaf(2))*(leaf(1)*leaf(4)), N)?
+\end{alltt}
+\begin{ans}
+\begin{alltt}
+        mintip(leaf(X), Val, Val)   :- Val < X.
+        mintip(leaf(X), Val, X)     :- Val >= X.
+        mintip(T1 ** T2, Val, Res)  :- mintip(T1, Val, Val'), mintip(T2, Val', Res).
+\end{alltt}
+\end{ans}
+\end{ex}
+\begin{ex}
+The  program $repmin(T, T')$  takes a numeric tree, $T$, and yields an 
+identically structured binary tree $T'$ whose leaves all have the value of
+the minimum tip of $T$.
+\begin{alltt}
+        repmin(T, R) :- mt(T, V, V, R).
+
+        mt(leaf N,   N,   X,   leaf X)   :- .
+        mt(T1 ** T2, Min, X,   T1'**T2') :- mt(T1,    Min',  X, T1'), 
+                                            mt(T2,    Min'', X, T2'),
+                                            min(Min', Min'', Min).
+
+        min(V, W, V) :- V<W.
+        min(V, W, W) :- V>=W.
+\end{alltt}
+
+The workhorse {\tt mt} might could be specified as: $mt(T, Min, X, T')$ holds
+when $T'$ is an identically structured tree to $T$ with all data in the leaves 
+replaced by the variable $X$, and $Min$ is the minimum value in the tree $T$.
+
+(turn over)
+\newpage
+Simulate, by means similar to those we demonstrated on slide \pageref{appendtrace}, the
+computation which solves 
+\begin{alltt}
+        repmin((leaf(3)*leaf(2))*(leaf(1)*leaf(4)), N)?
+\end{alltt}
+
+Explain what is happening here.
+
+\begin{ans}
+$mt$ is traversing the tree and building an isomorphic tree in 
+which the variable (the $V$ of the body of $repmin$) is replacing
+each leaf datum. When the recursive calls of $mt$ are done, the $min$
+relation assigns to $Min$ the minimum of the two subtrees' data. The topmost
+call of $mt$ (by $repmin$) makes the 
+logical variable which is distributed into the new tree the same
+as the logical variable to which the calculated minimum is assigned.
+\end{ans}
+\end{ex}
+
+\begin{ex}
+Define a predicate $select$ such that $select(Path, Tree, Tree')$ holds if
+$Tree'$ is the subtree of $Tree$ designated by $Path$, where $Path$ is
+a list containing an $l$ to indicate ``left subtreee'' and $r$ to 
+indicate ``right subtree''.
+
+For example
+\begin{alltt}
+        select(l:l:r:nil, 
+               ((leaf a ** leaf b) ** leaf c) ** leaf d, 
+               leaf b)?
+\end{alltt}
+
+Make sure that the predicate is defined in such a way that it can be
+used to determine $Path$ given $Tree$ and $Tree'$.
+
+What kind of answers would you expect to a query in which $Tree$ is a variable, but 
+$Tree'$ and $Path$ are not, such as:
+\begin{alltt}
+        select(l:r:l:r:l:r:nil, T, leaf 3)?
+\end{alltt}
+
+\begin{ans}
+A reasonable definition of this predicate is
+\begin{alltt}
+        select(nil, T, T).
+        select(l:XS, T'**T'', T) :- select(XS, T', T).
+        select(r:XS, T'**T'', T) :- select(XS, T'', T).
+\end{alltt}
+
+I'd expect an answer in which $Tree$ (in the example case $T$) is bound to a minimal
+tree containing the given path, with distinct variables at all the 
+leaves save that indicated by the path.
+At that point I'd expect to find $Tree'$. 
+In the example case, we'd get something like
+\begin{alltt}
+        T = T1 ** (T2 ** (T3 ** leaf "Hey" ** T4) ** T5) ** T6
+\end{alltt}
+\end{ans}
+\end{ex}
+
+\begin{ex}
+Define a predicate $assign$ such that $assign(New, Path, Tree, Tree')$ holds 
+if $Tree'$ is the same tree as $Tree$, except that $New$ is 
+to be found at $Path$.
+\begin{ans}
+\begin{alltt}
+        assign(U, nil,   T,  U).
+        assign(U, l:XS,  T'**T'', V**T'') :- assign(U, XS, T',  V).
+        assign(U, r:XS,  T'**T'', T'**V)  :- assign(U, XS, T'', V).
+\end{alltt}
+\end{ans}
+\end{ex}
+
+\begin{ex}
+Can the predicate $assign$ be used to implement the predicate $select$?
+If so, explain how.
+\begin{ans}
+\begin{alltt}
+        select(Path, Tree, Tree') :- assign(Path, Tree', Tree, Tree).
+\end{alltt}
+\end{ans}
+\end{ex}
+\end{exercises}
+
+
+\end{document}
+
+%-----------------------------------------------------------------------------------------------
+\begin{foil} 
+\end{foil}
+
+
+
+
+
+
+
+
+
+
+
+
+
